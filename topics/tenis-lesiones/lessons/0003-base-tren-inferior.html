@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lección 3 — Tu base de tren inferior: el eslabón que protege todo</title>
+<style>
+  :root{
+    --ink:#1c2a35; --soft:#5a6b78; --line:#e3e8ec; --bg:#fbfaf7;
+    --accent:#0b7a5a; --accent2:#c2410c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(20,40,55,.07),0 8px 24px rgba(20,40,55,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-size:33px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:#f0f6f3; border:1px solid #d4e7df; border-radius:12px; font-size:15px; color:#274a40}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:46px 0 12px; letter-spacing:-.2px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px}
+  cite{font-style:italic}
+
+  /* three pillars */
+  .pillars{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:22px 0}
+  .pillar{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 16px; box-shadow:var(--shadow); text-align:center}
+  .pillar .ico{font-size:26px}
+  .pillar h4{margin:8px 0 6px; font-size:15.5px}
+  .pillar p{margin:0; font-size:13px; color:var(--soft)}
+
+  .quality{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:18px 0; box-shadow:var(--shadow)}
+  .quality .lbl{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .quality h3{margin:10px 0 6px; font-size:20px}
+  .quality .why{font-size:15px; color:var(--ink)}
+  .ex{display:flex; gap:12px; align-items:flex-start; margin-top:12px; padding-top:12px; border-top:1px dashed var(--line)}
+  .ex .pin{flex:none; font-size:18px}
+  .ex b{font-size:15px}
+  .ex p{margin:2px 0 0; font-size:13.5px; color:var(--soft)}
+
+  .callout{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px}
+  .callout b{color:var(--accent2)}
+  .note{background:#f0f6f3; border:1px solid #d4e7df; border-left:4px solid var(--accent);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15px; color:#274a40}
+  .note b{color:var(--accent)}
+
+  /* session checklist */
+  .routine{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:6px 6px 0; margin:16px 0; box-shadow:var(--shadow); overflow:hidden}
+  .rhead{padding:14px 18px 6px}
+  .rhead h4{margin:0 0 2px; font-size:17px}
+  .rhead p{margin:0; font-size:13px; color:var(--soft)}
+  .item{display:flex; gap:14px; align-items:flex-start; padding:14px 18px; border-top:1px solid var(--line); cursor:pointer; transition:background .12s}
+  .item:hover{background:#fafcfb}
+  .item .box{flex:none; width:24px; height:24px; border:2px solid #c9d4cf; border-radius:7px; margin-top:2px;
+    display:flex; align-items:center; justify-content:center; font-size:15px; color:#fff; transition:all .12s}
+  .item.done .box{background:var(--accent); border-color:var(--accent)}
+  .item.done .txt h5{text-decoration:line-through; color:var(--soft)}
+  .item .txt h5{margin:0 0 3px; font-size:15.5px}
+  .item .txt .sets{font-weight:600; color:var(--accent2)}
+  .item .txt p{margin:2px 0 0; font-size:13px; color:var(--soft)}
+  .progress{padding:14px 18px; font-size:14px; font-weight:600; color:var(--accent); text-align:center; border-top:1px solid var(--line)}
+  .progress.full{color:#fff; background:var(--accent)}
+
+  .ask{margin:40px 0 0; padding:18px 22px; background:#f0f6f3; border:1px solid #d4e7df; border-radius:14px; font-size:15.5px; color:#274a40}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    h1{font-size:27px}
+    .pillars{grid-template-columns:1fr}
+  }
+  @media print{
+    body{background:#fff}
+    .item .box,.callout,.note,.progress{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .quality,.pillar,.routine{box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Lección 3 · Prevención de lesiones en tenis</p>
+  <h1>Tu base de tren inferior:<br>el eslabón que protege todo el resto</h1>
+  <p class="sub">Jugás sobre una pierna por vez. Tu cuerpo no entrena así casi nunca. Acá lo arreglamos.</p>
+
+  <div class="mission">
+    <span>🎯</span>
+    <div><b>Por qué esto es TU lección:</b> tu autoevaluación marcó <b>tren inferior/estabilidad</b> como
+    eslabón débil, venís de un <b>desgarro de cuádriceps</b>, y —clave— unas piernas fuertes
+    <b>descargan el saque</b> que te preocupaba. Un solo trabajo, tres beneficios.</div>
+  </div>
+
+  <p class="lede">El tren inferior es donde ocurre cerca de la <b>mitad</b> de las lesiones del tenista<sup><a href="#r1">1</a></sup>
+  y, a la vez, es la base de la <a href="../GLOSSARY.md">cadena cinética</a> que protege tu hombro. Pero hay
+  una trampa: el gym típico entrena <em>una</em> cualidad y el tenis exige <em>tres</em>.</p>
+
+  <h2>Las 3 cualidades que tu tren inferior necesita</h2>
+  <div class="pillars">
+    <div class="pillar"><div class="ico">🦵</div><h4>1 · Fuerza unilateral</h4><p>Jugás apoyado en una pierna, no en dos.</p></div>
+    <div class="pillar"><div class="ico">🛑</div><h4>2 · Excéntrica / frenar</h4><p>Te lesionás al desacelerar, no al acelerar.</p></div>
+    <div class="pillar"><div class="ico">⚖️</div><h4>3 · Equilibrio</h4><p>Control fino de tobillo y rodilla en apoyo.</p></div>
+  </div>
+  <p>La mayoría de los amateurs solo hace la primera (y muchas veces bilateral: sentadilla, prensa). Las
+  otras dos son las que de verdad previenen lesiones de tenis. Veámoslas.</p>
+
+  <div class="quality">
+    <span class="lbl">Cualidad 1 · Fuerza unilateral</span>
+    <h3>Una pierna por vez, como en la cancha</h3>
+    <p class="why">Cada split-step, cada estirada lateral, cada empuje del saque sale de <b>una</b> pierna.
+    El trabajo unilateral construye esa fuerza y, de paso, corrige asimetrías y entrena la estabilidad y la
+    propiocepción que tu test marcó flojas.<sup><a href="#r3">3</a></sup></p>
+    <div class="ex"><span class="pin">▸</span><div><b>Búlgaro (split squat) y peso muerto rumano a una pierna</b>
+      <p>Los dos pilares unilaterales: fuerza de cuádriceps/glúteo controlando la rodilla, y cadena posterior + equilibrio.</p></div></div>
+  </div>
+
+  <div class="quality">
+    <span class="lbl">Cualidad 2 · Excéntrica y desaceleración</span>
+    <h3>Frenar es donde te lesionás (y donde te protegés)</h3>
+    <p class="why">El tirón de aductor o de isquios casi nunca pasa empujando: pasa cuando el músculo
+    <b>frena</b> tu impulso lateral y se alarga bajo tensión.<sup><a href="#r2">2</a></sup> Entrenar esa
+    <a href="../GLOSSARY.md">capacidad excéntrica</a> es de lo más eficaz que existe: los excéntricos de
+    isquios reducen sus lesiones hasta un <b>70%</b>, y el ejercicio Copenhagen hace lo mismo con los aductores.<sup><a href="#r2">2</a></sup></p>
+    <div class="ex"><span class="pin">▸</span><div><b>Copenhagen (aductores) · Nórdico o curl excéntrico (isquios) · bajadas lentas de cuádriceps</b>
+      <p>Empezá SIEMPRE por la versión fácil (rodilla apoyada, recorrido corto). Son intensos; la progresión es lenta.</p></div></div>
+  </div>
+
+  <div class="quality">
+    <span class="lbl">Cualidad 3 · Equilibrio y aterrizaje</span>
+    <h3>El control fino que marcó tu test</h3>
+    <p class="why">Tu punto más flojo fue el equilibrio en una pierna con ojos cerrados — justo el control de
+    tobillo/rodilla que evita los esguinces y los mal-apoyos (lesiones <em>agudas</em> del tren inferior).
+    El equilibrio, la coordinación y los aterrizajes controlados son parte obligatoria de la prevención.<sup><a href="#r1">1</a></sup></p>
+    <div class="ex"><span class="pin">▸</span><div><b>Equilibrio progresivo + aterrizajes "clavados"</b>
+      <p>De ojos abiertos → cerrados → superficie inestable. Y saltitos donde <b>frenás y aguantás</b> el aterrizaje 2 s sin tambalear.</p></div></div>
+  </div>
+
+  <div class="callout">
+    <b>Ojo con tu cuádriceps:</b> venís de un desgarro. Eso hace la <b>excéntrica progresiva</b> aún más
+    valiosa, pero la progresás <em>despacio</em> — clave para vos: los isquios deberían tener al menos
+    <b>~60%</b> de la fuerza del cuádriceps, o el riesgo de tirón sube.<sup><a href="#r2">2</a></sup> Por eso
+    entrenamos las dos caras, no solo el cuádriceps.
+  </div>
+
+  <h2>Tu sesión de arranque (esta semana)</h2>
+  <p>Esto entra en <b>una</b> de tus 2 sesiones de gym (~25 min de bloque de piernas). Empezá conservador:
+  el objetivo de la semana 1 es <b>técnica y tolerancia</b>, no récords. <b>Tildá</b> a medida que los hacés.</p>
+
+  <div class="routine" id="routine">
+    <div class="rhead"><h4>Bloque tren inferior · v1</h4><p>2 vueltas al circuito. Descanso 60–90 s entre ejercicios. Nada al fallo.</p></div>
+    <div class="item">
+      <div class="box">✓</div>
+      <div class="txt"><h5>Split squat búlgaro — <span class="sets">3 × 8 por pierna</span></h5><p>Mancuernas livianas o solo peso corporal. Bajá controlando la rodilla; que no se vaya hacia adentro.</p></div>
+    </div>
+    <div class="item">
+      <div class="box">✓</div>
+      <div class="txt"><h5>Peso muerto rumano a 1 pierna — <span class="sets">3 × 8 por pierna</span></h5><p>Mancuerna del lado opuesto. Cadera atrás, espalda neutra; sentí el isquio y el equilibrio.</p></div>
+    </div>
+    <div class="item">
+      <div class="box">✓</div>
+      <div class="txt"><h5>Copenhagen (regresión) — <span class="sets">2 × 6–8 por lado</span></h5><p>Versión fácil: rodilla de abajo apoyada, pie de arriba en un banco. Subí la cadera lento. Si tira la ingle, acortá el recorrido.</p></div>
+    </div>
+    <div class="item">
+      <div class="box">✓</div>
+      <div class="txt"><h5>Curl nórdico asistido o curl excéntrico — <span class="sets">2 × 5</span></h5><p>Bajá lo más lento que puedas (3–5 s) y ayudate para volver. Solo la fase de bajada cuenta.</p></div>
+    </div>
+    <div class="item">
+      <div class="box">✓</div>
+      <div class="txt"><h5>Equilibrio 1 pierna + aterrizajes — <span class="sets">3 × 30 s / 5 saltos</span></h5><p>30 s en una pierna (progresá a ojos cerrados). Después 5 saltitos donde clavás y aguantás el aterrizaje 2 s.</p></div>
+    </div>
+    <div class="progress" id="progress">0 / 5 completados</div>
+  </div>
+
+  <div class="note">
+    <b>Regla de carga (otra vez, porque es la que más importa):</b> subí peso o repeticiones de a poco —
+    no más de ~10% por semana. El salto brusco de carga es el predictor de lesión más fuerte.<sup><a href="#r1">1</a></sup>
+    Mejor terminar cada serie sintiendo que te quedaban 2–3 repeticiones.
+  </div>
+
+  <div class="ask">
+    <b>👋 Tu profe.</b> Esta sesión cubre el bloque de <b>piernas</b>. En la <b>Lección 4</b> sumamos el bloque
+    de <b>hombro/escápula</b> (prehab del saque) para completar tus 2 sesiones semanales, y armamos la rutina
+    final en un documento de referencia imprimible. ¿Cómo te resultó el circuito? ¿Algún ejercicio que no
+    tengas claro cómo hacer? <b>Contame y ajustamos.</b>
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">Revisión sistemática — <cite>Risk Factors and Prevention of Musculoskeletal Injuries… in Tennis Players</cite> (2025).
+        <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12568103/">PMC12568103</a>. Tren inferior como zona más lesionada; balance/plyometría y manejo de carga en prevención.</li>
+      <li id="r2">Excéntricos en prevención: Copenhagen (aductores) y Nórdico (isquios) —
+        <a href="https://ijspt.scholasticahq.com/article/27975-the-neuromuscular-effects-of-the-copenhagen-adductor-exercise-a-systematic-review">IJSPT: Copenhagen Adductor Exercise (revisión)</a>;
+        mecanismo de lesión por desaceleración y cociente isquios:cuádriceps —
+        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10569248/">PMC10569248</a>.</li>
+      <li id="r3">Trabajo unilateral (single-leg RDL): fuerza unilateral, propiocepción y control para gestos de tenis —
+        <a href="https://www.strengthlog.com/strength-training-for-tennis/">StrengthLog: Strength Training for Tennis</a>.</li>
+    </ol>
+    <p>Más fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Terminología en <a href="../GLOSSARY.md">GLOSSARY.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <a href="0002-fuga-cadena-saque.html">← Lección 2</a>
+      <a href="../reference/autoevaluacion-fisica-tenis.html">Autoevaluación</a>
+      <span style="color:#cbd5d1">Lección 4 · hombro/escápula (próximamente)</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const items = Array.from(document.querySelectorAll('#routine .item'));
+  const prog = document.getElementById('progress');
+  const total = items.length;
+  function update(){
+    const done = items.filter(i=>i.classList.contains('done')).length;
+    if(done===total){ prog.textContent = "✓ ¡Bloque completo! Buen trabajo — anotá cómo te sentiste."; prog.classList.add('full'); }
+    else { prog.textContent = done + " / " + total + " completados"; prog.classList.remove('full'); }
+  }
+  items.forEach(i=> i.addEventListener('click', ()=>{ i.classList.toggle('done'); update(); }));
+})();
+</script>
+</body>
+</html>

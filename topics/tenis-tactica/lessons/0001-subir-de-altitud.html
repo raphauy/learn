@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Táctica 1 — Subí de altitud: el partido es una estructura, no una fila de pelotas</title>
+<style>
+  :root{
+    --ink:#1b2233; --soft:#5d6478; --line:#e4e6ef; --bg:#fbfaf9;
+    --accent:#3a45b0; --accent-soft:#eef0fb; --accent-line:#d6daf1; --accent-ink:#2a2f78;
+    --accent2:#c2410c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(24,28,55,.07),0 8px 24px rgba(24,28,55,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-size:33px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:12px; font-size:15px; color:var(--accent-ink)}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:46px 0 12px; letter-spacing:-.2px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px}
+  cite{font-style:italic}
+  em.q{font-style:italic; color:var(--accent-ink)}
+
+  /* altitude ladder */
+  .ladder{margin:22px 0; border-radius:16px; overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow)}
+  .rung{display:flex; gap:14px; align-items:center; padding:15px 18px; background:var(--card); border-top:1px solid var(--line)}
+  .rung:first-child{border-top:none}
+  .rung .lvl{flex:none; width:74px; font-weight:800; font-size:13px; letter-spacing:.04em; text-transform:uppercase; color:var(--accent)}
+  .rung .body h4{margin:0 0 2px; font-size:16px}
+  .rung .body p{margin:0; font-size:13.5px; color:var(--soft)}
+  .rung.here{background:linear-gradient(90deg,#fff7ed, #fffdfa); border-left:4px solid var(--accent2)}
+  .rung.here .lvl{color:var(--accent2)}
+  .rung .tag{margin-left:auto; flex:none; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+    color:#fff; background:var(--accent2); padding:3px 9px; border-radius:999px; align-self:flex-start; margin-top:2px}
+  .rung .tag.goal{background:var(--accent)}
+
+  /* data cards */
+  .data{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:22px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 18px; box-shadow:var(--shadow)}
+  .stat .big{font-size:38px; font-weight:800; letter-spacing:-1px; color:var(--accent); line-height:1}
+  .stat h4{margin:8px 0 6px; font-size:15px}
+  .stat p{margin:0; font-size:13.5px; color:var(--soft)}
+  .stat .big.b2{color:var(--accent2)}
+
+  .callout{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px}
+  .callout b{color:var(--accent2)}
+  .note{background:var(--accent-soft); border:1px solid var(--accent-line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15px; color:var(--accent-ink)}
+  .note b{color:var(--accent)}
+
+  /* two problems */
+  .probs{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
+  .prob{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px; box-shadow:var(--shadow)}
+  .prob h4{margin:0 0 6px; font-size:15.5px; color:var(--bad)}
+  .prob p{margin:0; font-size:14px; color:var(--ink)}
+  .prob p b{color:var(--accent)}
+
+  /* practice box */
+  .practice{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:18px 0; box-shadow:var(--shadow)}
+  .practice .lbl{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .practice h3{margin:10px 0 4px; font-size:20px}
+  .step{display:flex; gap:14px; align-items:flex-start; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line)}
+  .step .n{flex:none; width:28px; height:28px; border-radius:8px; background:var(--accent-soft); color:var(--accent);
+    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px}
+  .step b{font-size:15px}
+  .step p{margin:3px 0 0; font-size:13.5px; color:var(--soft)}
+
+  /* quiz */
+  .quiz{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:8px 8px 6px; margin:22px 0; box-shadow:var(--shadow); overflow:hidden}
+  .qhead{padding:16px 18px 6px}
+  .qhead h4{margin:0 0 2px; font-size:17px}
+  .qhead p{margin:0; font-size:13px; color:var(--soft)}
+  .q{padding:16px 18px; border-top:1px solid var(--line)}
+  .q .scn{font-size:15.5px; margin:0 0 12px}
+  .q .scn b{color:var(--accent-ink)}
+  .opt{display:block; width:100%; text-align:left; font:inherit; font-size:14.5px; color:var(--ink);
+    background:#fbfbfd; border:1.5px solid var(--line); border-radius:10px; padding:11px 14px; margin:8px 0; cursor:pointer; transition:all .12s}
+  .opt:hover{border-color:var(--accent-line); background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--good); background:#f0fdf4}
+  .opt.wrong{border-color:var(--bad); background:#fef2f2}
+  .fb{font-size:13.5px; margin:8px 2px 0; padding:11px 14px; border-radius:10px; display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0}
+  .fb.no{background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca}
+  .fb b{font-weight:800}
+  .qscore{padding:14px 18px; font-size:14.5px; font-weight:700; color:var(--accent); text-align:center; border-top:1px solid var(--line)}
+  .qscore.full{color:#fff; background:var(--accent)}
+
+  .ask{margin:40px 0 0; padding:18px 22px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:14px; font-size:15.5px; color:var(--accent-ink)}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    h1{font-size:27px}
+    .data,.probs{grid-template-columns:1fr}
+    .rung .tag{display:none}
+  }
+  @media print{
+    body{background:#fff}
+    .stat,.prob,.practice,.quiz,.ladder{box-shadow:none}
+    .callout,.note,.rung.here{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Táctica de torneo · Lección 1 · Track Cabeza</p>
+  <h1>Subí de altitud:<br>el partido es una estructura, no una fila de pelotas</h1>
+  <p class="sub">Corrés a todas, pegás bien y perdés igual. Casi siempre el problema no es la pelota: es la altura desde la que mirás el partido.</p>
+
+  <div class="mission">
+    <span>🎯</span>
+    <div><b>Por qué esta es TU lección.</b> Lo dijiste con todas las letras: <em class="q">"solo juego cada punto lo mejor
+    que puedo, no siento que pueda visualizar algo más global como el partido completo"</em>. Ese es, textual, el techo
+    que vamos a romper. Y explica de paso tus dos quejas: <b>jugás igual contra todos</b> y <b>perdés con pushers</b>.</div>
+  </div>
+
+  <p class="lede">Tenés un motor enorme y un saque mejor que el de casi todos tus rivales. Sin embargo hay gente que
+  <em>no pega mejor que vos</em> y te gana. No te ganan con la raqueta: te ganan pensando <b>un piso más arriba</b>.
+  Hoy jugás en la planta baja —la <b>pelota</b>— y te falta subir el ascensor.</p>
+
+  <h2>La escalera de altitud táctica</h2>
+  <p>Un partido no es una sucesión de pelotas: son <b>cinco niveles anidados</b>, y en cada uno la pregunta cambia.
+  Vos vivís en el primer escalón. Ahí se juega la técnica, pero <em>no se gana el partido</em>.</p>
+
+  <div class="ladder">
+    <div class="rung here">
+      <div class="lvl">Pelota</div>
+      <div class="body"><h4><em class="q">"¿Meto esta bien?"</em></h4><p>Ejecución pura. Necesaria, pero es reactiva: respondés a lo que viene.</p></div>
+      <span class="tag">Acá vivís hoy</span>
+    </div>
+    <div class="rung">
+      <div class="lvl">Punto</div>
+      <div class="body"><h4><em class="q">"¿Cómo construyo ESTE punto?"</em></h4><p>Intención y patrón: saque+1, a dónde abro, cuándo cierro. Empezás a decidir, no solo a responder.</p></div>
+      <span class="tag goal">Subí acá</span>
+    </div>
+    <div class="rung">
+      <div class="lvl">Game</div>
+      <div class="body"><h4><em class="q">"¿Este punto cuánto pesa?"</em></h4><p>30-0 y 30-40 no se juegan igual. Los puntos grandes piden tu patrón más seguro, no el más lindo.</p></div>
+    </div>
+    <div class="rung">
+      <div class="lvl">Set</div>
+      <div class="body"><h4><em class="q">"¿Mi plan está funcionando?"</em></h4><p>¿Voy ganando o perdiendo con lo que estoy haciendo? Si pierdo rápido, cambio el plan —no el esfuerzo.</p></div>
+    </div>
+    <div class="rung">
+      <div class="lvl">Partido</div>
+      <div class="body"><h4><em class="q">"¿Quién es este rival y qué plan le gana?"</em></h4><p>El nivel que te falta por completo hoy. Acá se decide por qué a uno le ganás fácil y a otro parecido no.</p></div>
+    </div>
+  </div>
+
+  <p>No hace falta pensar en los cinco a la vez. Pero <b>sí</b> tenés que poder subir y bajar el ascensor a voluntad.
+  El que te gana sin pegar mejor que vos es, casi siempre, alguien que está operando dos pisos más arriba.</p>
+
+  <h2>Dos datos que te van a liberar</h2>
+  <p>Craig O'Shannessy —el analista de datos que trabajó con Djokovic— midió millones de puntos. Dos números
+  cambian por completo cómo deberías gastar tu energía:</p>
+
+  <div class="data">
+    <div class="stat">
+      <div class="big">+60%</div>
+      <h4>de los puntos terminan en 4 golpes o menos</h4>
+      <p>Más del 60% —y ~69% en Grand Slam reciente.<sup><a href="#r1">1</a></sup><sup><a href="#r3">3</a></sup> El largo
+      de rally <b>más frecuente es 1 solo golpe</b>.<sup><a href="#r2">2</a></sup> El punto se decide <em>temprano</em>.</p>
+    </div>
+    <div class="stat">
+      <div class="big b2">~70%</div>
+      <h4>de los puntos terminan en error, no en winner</h4>
+      <p>La mayoría de los puntos no los <em>gana</em> alguien pegando un tiro perfecto: los <b>pierde</b> alguien que
+      falla.<sup><a href="#r2">2</a></sup> Ganar es, sobre todo, <b>no regalar y hacer fallar</b>.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>Leé esto dos veces.</b> Si el punto se decide en los primeros 4 golpes y tu saque es tu mejor arma, entonces
+    <b>estás desperdiciando tu arma cada vez que "pongo la primera y a pelotear"</b>. Y si el 70% de los puntos se
+    pierden por error, tu objetivo real no es <em>"jugar cada pelota lo mejor posible"</em> (perfección) sino
+    <b>elegir el punto que le hace fallar al otro</b>. Ese cambio de objetivo <em>es</em> subir de altitud.
+  </div>
+
+  <h2>Por qué esto explica tus dos problemas</h2>
+  <div class="probs">
+    <div class="prob">
+      <h4>“Juego igual contra todos”</h4>
+      <p>Claro: solo operás en la altitud <b>Pelota/Punto</b>. La pregunta <em>"¿quién es este rival?"</em> vive en la
+      altitud <b>Partido</b>, un piso al que nunca subís. Sin ese piso, no hay plan que cambiar. <b>Tener un plan y
+      adaptarlo al rival</b> es la tesis central de <cite>Winning Ugly</cite> de Brad Gilbert.<sup><a href="#r4">4</a></sup></p>
+    </div>
+    <div class="prob">
+      <h4>“Pierdo con pushers”</h4>
+      <p>El pusher <em>ya interiorizó</em> el 70%: hizo de <b>no fallar</b> su oficio y espera tu error. Si tu plan es
+      correr y meter más que él, estás jugando <em>su</em> partido —y a ese juego, gana el que menos falla. La salida no
+      es más esfuerzo: es <b>cambiar de altitud</b> (construir, mover, atraerlo a la red).<sup><a href="#r5">5</a></sup></p>
+    </div>
+  </div>
+  <div class="note">
+    <b>La distinción que lo ordena todo:</b> tu instinto ante un problema es <em>correr más y pegar más</em> —subir el
+    esfuerzo dentro del mismo escalón. La táctica es lo contrario: <b>cambiar de escalón</b>. Muchas veces se gana
+    bajando el esfuerzo y subiendo la altitud.
+  </div>
+
+  <h2>Tu primer ejercicio de altitud</h2>
+  <p>Nada de teoría más: tu próximo entrenamiento o partido, dos micro-hábitos. Son minúsculos a propósito —el objetivo
+  es <b>sentir</b> la diferencia entre jugar la pelota y jugar el punto.</p>
+
+  <div class="practice">
+    <span class="lbl">Practicá esto (2 hábitos)</span>
+    <h3>Subir el ascensor, un piso por vez</h3>
+    <div class="step">
+      <div class="n">1</div>
+      <div><b>Antes de cada saque y cada resto, decí UNA palabra.</b> Tu intención para el punto: <em>"profundo"</em>,
+      <em>"a su revés"</em>, <em>"saque abierto + drive al hueco"</em>. Con eso ya no estás jugando la pelota: estás
+      jugando el <b>punto</b> (segundo escalón). No importa si te sale; importa que <em>tenías un plan</em>.
+      <p>Regla: si no se te ocurre la palabra, ese es exactamente el músculo que estamos entrenando.</p></div>
+    </div>
+    <div class="step">
+      <div class="n">2</div>
+      <div><b>En cada cambio de lado, respondé una pregunta.</b> <em>"¿Lo que estoy haciendo está funcionando? Sí / No.
+      Si es No, ¿qué cambio?"</em> Eso te sube a la altitud <b>Set/Partido</b> una vez cada pocos games, sin saturarte.
+      <p>Después del partido, en una línea: <em>por qué</em> lo gané o lo perdí, en términos de plan —no de "jugué bien/mal".</p></div>
+    </div>
+  </div>
+
+  <h2>Probate: ¿en qué altitud está la respuesta?</h2>
+  <p>Tres escenarios de partido. Elegí la opción que <b>cambia de altitud</b> en vez de subir el esfuerzo. Feedback al toque.</p>
+
+  <div class="quiz" id="quiz">
+    <div class="qhead"><h4>Quiz de escenarios</h4><p>Tocá una opción para ver por qué. No hay penalización por probar.</p></div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>1.</b> La mayoría de los puntos duran ≤4 golpes y tu mejor arma es el saque. En tu próximo turno de servicio, ¿qué te da más rédito?</p>
+      <button class="opt" data-fb="Es lo que hacés hoy — y es puro escalón 'pelota'. Regalás la ventaja de tu mejor arma justo en la zona donde se decide el punto.">Poner la primera adentro y empezar a pelotear como siempre.</button>
+      <button class="opt" data-fb="Eso es saque+1: jugás en la altitud del PATRÓN. Aprovechás que el punto se decide temprano Y que tu saque es superior. Tu arma, usada con intención.">Sacar ya con una idea del +1: saque abierto → drive al hueco que abre.</button>
+      <button class="opt" data-fb="Potencia sin plan sigue siendo 'pelota'. El ace es un bonus, no un plan; el plan es qué hacés con la bola corta que tu buen saque te va a devolver.">Sacar lo más fuerte posible siempre, a buscar el ace.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>2.</b> Vas <b>2-5</b> en el primer set contra un pusher que no falla una. Tu instinto: correr y meter más que él. ¿Altitud correcta?</p>
+      <button class="opt" data-fb="Cuidado: igualar paciencia con paciencia es jugar SU partido. En ese intercambio gana el que menos falla — y ese es él, no vos. Estás subiendo esfuerzo dentro del mismo escalón.">Sí: soy el que mejor corre, tarde o temprano se cansa.</button>
+      <button class="opt" data-fb="Exacto. Ir 2-5 es la señal de altitud 'Set': el plan A (out-grind) está perdiendo. Cambiás el PLAN (construir, mover, atraerlo a la red), no la intensidad. A este rival le dedicamos una lección entera más adelante.">No: el plan no funciona. Cambio de altitud, no de esfuerzo.</button>
+      <button class="opt" data-fb="Tirar winners desde el fondo contra un muro es alimentar el 70%: la mayoría de esos tiros terminan en TU error. Construir ≠ arriesgar.">Sí, pero arriesgando winners para acortar los puntos.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>3.</b> Con tu saque vas <b>40-0</b>, y en el mismo game llegás a <b>30-40</b> (punto de quiebre en contra). ¿Jugás los dos puntos igual?</p>
+      <button class="opt" data-fb="Es tu hábito actual (escalón 'pelota'). Pero 40-0 y 30-40 no pesan lo mismo: el marcador cambia qué conviene jugar. Eso es leer la altitud 'Game'.">Sí, siempre juego cada punto lo mejor que puedo.</button>
+      <button class="opt" data-fb="Sí. Mismo golpe, distinto contexto: en 40-0 podés probar; en 30-40 elegís tu patrón MÁS confiable (tu saque a tu zona favorita + tu drive), no el más vistoso. Los puntos grandes se juegan seguros.">No: el marcador cambia qué punto me conviene jugar.</button>
+      <button class="opt" data-fb="Bajar los brazos en 30-40 es regalar el break. Jugar seguro no es jugar pasivo: es jugar TU patrón más sólido con decisión.">En 30-40 juego a no fallar y que decida él.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="qscore" id="qscore">0 / 3 — probá los tres</div>
+  </div>
+
+  <div class="ask">
+    <b>👋 Tu profe.</b> Esta lección te dio el <em>mapa</em> (la escalera) y el <em>porqué</em> (los dos datos). La próxima
+    bajamos a lo concreto: armar tu <b>plan de partido</b> apoyado en tu saque —el patrón <b>saque+1</b>— para que dejes de
+    jugar igual contra todos. Y más adelante, la lección dedicada a <b>desarmar al pusher</b> (que se va a apoyar en la volea
+    que estás trabajando con tu coach). ¿Te cierra la idea de "altitud"? ¿Querés que la próxima sea el plan de partido o
+    directamente el pusher? <b>Decime y seguimos.</b>
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">Craig O'Shannessy — <cite>First Strike Tennis</cite>.
+        <a href="https://tennisplayer.net/article/first-strike-tennis/">tennisplayer.net</a>.
+        +60% de los puntos se deciden en ≤4 golpes (Wawrinka, AO 2015: 66%); definición de "first strike": saque/saque+1, devolución/devolución+1.</li>
+      <li id="r2">Craig O'Shannessy — entrevista.
+        <a href="https://tennisaustin.org/interview-with-craig-oshannessy/">tennisaustin.org</a>.
+        <cite>"Seventy percent of points end in an error versus a winner"</cite>; la mayoría de los puntos son de ≤4 golpes; el largo de rally más frecuente es 1 golpe.</li>
+      <li id="r3">Craig O'Shannessy — <cite>Brain Game Tennis</cite>, análisis US Open 2024 (0-4 golpes = 69% H / 68% M).
+        <a href="https://braingametennis.com/">braingametennis.com</a>. <em>(cifra confirmada por índice de búsqueda; el sitio bloquea el acceso automatizado.)</em></li>
+      <li id="r4">Brad Gilbert &amp; Steve Jamison — <cite>Winning Ugly: Mental Warfare in Tennis</cite> (1993).
+        <a href="https://www.tennis.com/news/articles/winning-ugly-revisited-brad-gilbert-s-ethos-returns-with-coco-gauff-slam-triumph">Retrospectiva en Tennis.com (Drucker, 2023)</a>. Tené un plan y adaptalo al rival; ganar no es jugar lindo.</li>
+      <li id="r5">USTA — <cite>Tactical Tennis: Playing the Runner-Pusher</cite>.
+        <a href="https://www.usta.com/en/home/improve/tips-and-instruction/national/tactical-tennis--playing-the-runner-pusher.html">usta.com</a>. Pegar detrás del rival (wrong-foot) y atraerlo a la red para salir del intercambio de paciencia.</li>
+    </ol>
+    <p>Más fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Tu misión en <a href="../MISSION.md">MISSION.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <span style="color:#b9bdd0">Táctica · Lección 1 (primera del tema)</span>
+      <a href="../../tenis-lesiones/lessons/0001-mapa-lesiones-y-eslabon-debil.html">Otro tema: Lesiones · Lección 1</a>
+      <span style="color:#b9bdd0">Próxima · Plan de partido &amp; saque+1 (en construcción)</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const quiz = document.getElementById('quiz');
+  const qs = Array.from(quiz.querySelectorAll('.q'));
+  const scoreEl = document.getElementById('qscore');
+  const answered = new Array(qs.length).fill(false);
+
+  qs.forEach((q, qi) => {
+    const correct = parseInt(q.dataset.correct, 10);
+    const opts = Array.from(q.querySelectorAll('.opt'));
+    const fb = q.querySelector('.fb');
+    opts.forEach((opt, oi) => {
+      opt.addEventListener('click', () => {
+        const isRight = (oi === correct);
+        opt.classList.add(isRight ? 'right' : 'wrong');
+        fb.textContent = opt.dataset.fb;
+        fb.className = 'fb show ' + (isRight ? 'ok' : 'no');
+        if(!answered[qi]){
+          answered[qi] = isRight ? 'ok' : 'seen';
+          update();
+        }
+        if(isRight){
+          opts.forEach(o => o.disabled = true);
+        }
+      });
+    });
+  });
+
+  function update(){
+    const right = answered.filter(a => a === 'ok').length;
+    if(right === qs.length){
+      scoreEl.textContent = "✓ Los tres: la respuesta táctica casi nunca es 'más esfuerzo', es 'otra altitud'.";
+      scoreEl.classList.add('full');
+    } else {
+      scoreEl.textContent = right + " / " + qs.length + " resueltos — seguí probando";
+      scoreEl.classList.remove('full');
+    }
+  }
+})();
+</script>
+</body>
+</html>

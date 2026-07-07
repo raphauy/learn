@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lección 1 — El mapa de lesiones del tenista (y tu eslabón débil)</title>
+<style>
+  :root{
+    --ink:#1c2a35; --soft:#5a6b78; --line:#e3e8ec; --bg:#fbfaf7;
+    --accent:#0b7a5a; --accent2:#c2410c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(20,40,55,.07),0 8px 24px rgba(20,40,55,.06);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    letter-spacing:.1px;
+  }
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  header.lead{margin-bottom:40px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 10px}
+  h1{font-size:34px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:#f0f6f3; border:1px solid #d4e7df; border-radius:12px; font-size:15px; color:#274a40}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:48px 0 12px; letter-spacing:-.2px}
+  h3{font-size:18px; margin:26px 0 8px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  cite, .cite{font-style:normal}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px; color:var(--ink)}
+
+  /* injury map */
+  .map{margin:22px 0; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); box-shadow:var(--shadow)}
+  .maprow{display:grid; grid-template-columns:150px 1fr; gap:0; align-items:center; border-bottom:1px solid var(--line)}
+  .maprow:last-child{border-bottom:none}
+  .zone{padding:12px 16px; font-weight:600; font-size:15px; border-right:1px solid var(--line); background:#fcfcfb}
+  .barwrap{padding:12px 16px}
+  .bar{height:22px; border-radius:6px; position:relative; background:linear-gradient(90deg,var(--c1),var(--c2))}
+  .bar span{position:absolute; right:8px; top:50%; transform:translateY(-50%); font-size:12px; font-weight:700; color:#fff}
+  .zone small{display:block; font-weight:400; color:var(--soft); font-size:12px; margin-top:2px}
+
+  /* lever cards */
+  .levers{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:20px 0}
+  .lever{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px; box-shadow:var(--shadow)}
+  .lever .n{display:inline-flex; width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff;
+    align-items:center; justify-content:center; font-weight:700; font-size:14px; margin-bottom:8px}
+  .lever h4{margin:0 0 6px; font-size:16px}
+  .lever p{margin:0; font-size:14px; color:var(--soft)}
+
+  .callout{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px}
+  .callout b{color:var(--accent2)}
+
+  /* self-assessment */
+  .assess{margin:26px 0; padding:4px}
+  .test{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px;
+    margin:14px 0; box-shadow:var(--shadow)}
+  .test .tag{font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--accent)}
+  .test h4{margin:4px 0 8px; font-size:18px}
+  .test .how{font-size:15px; color:var(--ink); margin:0 0 6px}
+  .test .red{font-size:14px; color:var(--soft); margin:0 0 14px}
+  .test .red b{color:var(--bad)}
+  .opts{display:flex; gap:8px; flex-wrap:wrap}
+  .opts button{flex:1; min-width:90px; cursor:pointer; border:1.5px solid var(--line); background:#fff;
+    border-radius:10px; padding:10px 8px; font-size:14px; font-weight:600; color:var(--ink);
+    transition:all .12s ease}
+  .opts button:hover{border-color:#bcd}
+  .opts button.sel[data-v="0"]{background:#ecfdf3; border-color:var(--good); color:var(--good)}
+  .opts button.sel[data-v="1"]{background:#fffbeb; border-color:var(--warn); color:var(--warn)}
+  .opts button.sel[data-v="2"]{background:#fef2f2; border-color:var(--bad); color:var(--bad)}
+  .fb{font-size:14px; margin:12px 0 0; padding:10px 14px; border-radius:8px; background:#f6f8f9;
+    color:var(--soft); display:none}
+  .fb.show{display:block}
+
+  #resultBtn{display:block; width:100%; margin:22px 0 0; cursor:pointer; border:none;
+    background:var(--accent); color:#fff; font-size:17px; font-weight:700; padding:16px;
+    border-radius:12px; transition:opacity .12s; letter-spacing:.2px}
+  #resultBtn:hover{opacity:.92}
+  #resultBtn:disabled{background:#cbd5d1; cursor:not-allowed}
+  #result{margin-top:22px; display:none}
+  #result.show{display:block; animation:rise .3s ease}
+  @keyframes rise{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .resultcard{background:linear-gradient(160deg,#0b7a5a,#0a5e6b); color:#fff; border-radius:16px;
+    padding:24px 26px; box-shadow:var(--shadow)}
+  .resultcard h3{margin:0 0 6px; font-size:14px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#a7e8d3}
+  .resultcard .big{font-size:26px; font-weight:800; margin:0 0 10px; letter-spacing:-.3px}
+  .resultcard p{margin:0 0 8px; font-size:15.5px; color:#e7fff7}
+  .resultcard .next{display:inline-block; margin-top:10px; background:#ffffff22; border:1px solid #ffffff44;
+    padding:8px 14px; border-radius:999px; font-size:14px; font-weight:600}
+
+  .ask{margin:46px 0 0; padding:18px 22px; background:#f0f6f3; border:1px solid #d4e7df;
+    border-radius:14px; font-size:15.5px; color:#274a40}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:54px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    .levers{grid-template-columns:1fr}
+    .maprow{grid-template-columns:120px 1fr}
+    h1{font-size:28px}
+  }
+  @media print{
+    body{background:#fff}
+    .opts button,#resultBtn{display:none}
+    .fb,#result{display:block !important}
+    .test,.lever,.map{box-shadow:none}
+    .resultcard{background:#0b7a5a !important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="lead">
+    <p class="kicker">Lección 1 · Prevención de lesiones en tenis</p>
+    <h1>El mapa de lesiones del tenista<br>(y cómo encontrar tu eslabón débil)</h1>
+    <p class="sub">Una cosa, diez minutos: saber dónde está realmente el riesgo y cuál es <em>tu</em> punto frágil hoy.</p>
+    <div class="mission">
+      <span>🎯</span>
+      <div><b>Por qué esto, ahora:</b> tu misión es <b>jugar sin lesionarte</b> con solo 2 sesiones de
+      gym por semana. Antes de tocar una pesa hay que saber a qué apuntar. Esta lección te da el blanco.</div>
+    </div>
+  </header>
+
+  <p class="lede">El error clásico del amateur avanzado es entrenar fuerza “en general”. Pero el tenis
+  lesiona en lugares específicos y por razones específicas. Si conocés el mapa, tus 2 sesiones rinden el triple.</p>
+
+  <h2>1 · Dónde se lesiona un tenista (te va a sorprender)</h2>
+  <p>Cuando uno piensa “lesión de tenis” piensa en el hombro o el codo. Pero los datos de una revisión
+  sistemática reciente en jugadores de alto rendimiento cuentan otra historia<sup><a href="#r1">1</a></sup>:</p>
+
+  <div class="map" aria-label="Distribución aproximada de lesiones en tenis">
+    <div class="maprow">
+      <div class="zone">Tren inferior <small>tobillo, rodilla, aductores, pantorrilla</small></div>
+      <div class="barwrap"><div class="bar" style="--c1:#0b7a5a;--c2:#13a07a; width:96%"><span>~½ de las lesiones</span></div></div>
+    </div>
+    <div class="maprow">
+      <div class="zone">Zona lumbar / espalda <small>rotación + extensión repetida</small></div>
+      <div class="barwrap"><div class="bar" style="--c1:#c2410c;--c2:#e06a2c; width:55%"><span>12–39%</span></div></div>
+    </div>
+    <div class="maprow">
+      <div class="zone">Hombro <small>sobreuso del saque</small></div>
+      <div class="barwrap"><div class="bar" style="--c1:#b45309;--c2:#d68a2e; width:42%"><span>sobreuso #1</span></div></div>
+    </div>
+    <div class="maprow">
+      <div class="zone">Codo / muñeca <small>“codo de tenista”</small></div>
+      <div class="barwrap"><div class="bar" style="--c1:#6b21a8;--c2:#9244c9; width:30%"><span>frecuente</span></div></div>
+    </div>
+  </div>
+
+  <p>Dos lecturas clave:</p>
+  <p>• El <b>tren inferior</b> concentra la mayoría de las lesiones <em>agudas</em> (un mal apoyo, un esguince,
+  un tirón de aductor)<sup><a href="#r1">1</a></sup>. Los aductores/ingle son de los tirones más frecuentes y se asocian
+  a <b>debilidad y asimetría</b> de fuerza (16–20% menos en la pierna lesionada)<sup><a href="#r2">2</a></sup>.</p>
+  <p>• El <b>hombro, el codo y la lumbar</b> dominan las lesiones por <a href="../GLOSSARY.md">sobreuso</a>:
+  daño acumulado, no un golpe único. Acá es donde más podés intervenir desde el gym.</p>
+
+  <h2>2 · Los 4 diales que controlás desde afuera de la cancha</h2>
+  <p>La buena noticia: casi todo lo que sube tu riesgo es <em>entrenable</em>. Estos son los cuatro diales
+  donde tus 2 sesiones semanales mueven la aguja. Las próximas lecciones desarrollan cada uno.</p>
+
+  <div class="levers">
+    <div class="lever">
+      <span class="n">1</span>
+      <h4>Carga aguda:crónica</h4>
+      <p>Subir el volumen de a poco. Saltar de golpe (ratio ≥1.5 en una semana) es el predictor
+      <b>extrínseco más fuerte</b> de lesión.<sup><a href="#r1">1</a></sup></p>
+    </div>
+    <div class="lever">
+      <span class="n">2</span>
+      <h4>Desequilibrios específicos</h4>
+      <p>El tenista repite gestos asimétricos: <a href="../GLOSSARY.md">GIRD</a>, escápula descontrolada,
+      aductores flojos. Igualar lo que el deporte desbalancea.</p>
+    </div>
+    <div class="lever">
+      <span class="n">3</span>
+      <h4>Fuerza, potencia y <em>frenar</em></h4>
+      <p>No solo generar fuerza: <a href="../GLOSSARY.md">desacelerar</a> con control la rotación y los
+      cambios de dirección. Frenar bien protege tanto como pegar fuerte.<sup><a href="#r2">2</a></sup></p>
+    </div>
+    <div class="lever">
+      <span class="n">4</span>
+      <h4>Movilidad y rango</h4>
+      <p>Recuperar el rango que el juego te roba (rotación interna de hombro, cadera). El rango sano
+      reparte la carga en vez de concentrarla.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>El dato que casi nadie usa:</b> combinar trabajo de <a href="../GLOSSARY.md">cadena cinética</a> +
+    fortalecimiento excéntrico del manguito rotador bajó las lesiones por sobreuso un <b>26%</b>, y subir
+    la carga con una estrategia de “rampa” de 4 semanas las redujo hasta un <b>21%</b>.<sup><a href="#r1">1</a></sup>
+    No es magia: es dirigir el esfuerzo al lugar correcto.
+  </div>
+
+  <h2>3 · Encontrá tu eslabón débil (2 minutos, hacelo ahora)</h2>
+  <p>No todos los tenistas tienen el mismo punto frágil. Hacé estos cuatro mini-tests <em>ahora mismo</em>
+  (necesitás solo una silla y una pared) y marcá cómo te fue. Al final te digo cuál priorizar.</p>
+
+  <div class="assess" id="assess">
+
+    <div class="test" data-zone="hombro">
+      <span class="tag">Hombro · rotación interna</span>
+      <h4>Mano a la espalda</h4>
+      <p class="how">Parado, llevá una mano por detrás de la espalda hacia <em>arriba</em>, intentando tocar
+      lo más alto posible entre los omóplatos. Hacelo con el brazo dominante y con el otro. Compará hasta
+      dónde llega cada uno.</p>
+      <p class="red"><b>Bandera roja:</b> el brazo dominante (con el que pegás) llega claramente <b>más abajo</b>
+      que el otro → posible <a href="../GLOSSARY.md">GIRD</a>.</p>
+      <div class="opts">
+        <button data-v="0">Simétrico</button>
+        <button data-v="1">Leve diferencia</button>
+        <button data-v="2">Dominante mucho peor</button>
+      </div>
+      <p class="fb"></p>
+    </div>
+
+    <div class="test" data-zone="cadera">
+      <span class="tag">Cadera · aductores</span>
+      <h4>Apretón de aductores</h4>
+      <p class="how">Acostado boca arriba, rodillas flexionadas, pies en el piso. Poné los dos puños (o una
+      pelota) entre las rodillas y apretá fuerte 5 segundos, 5 veces. Sentí la fuerza y si hay molestia o
+      asimetría entre un lado y otro.</p>
+      <p class="red"><b>Bandera roja:</b> <b>dolor</b>, pinchazo en la ingle, o un lado claramente más débil.</p>
+      <div class="opts">
+        <button data-v="0">Fuerte, sin molestia</button>
+        <button data-v="1">Algo débil o tirante</button>
+        <button data-v="2">Débil o duele</button>
+      </div>
+      <p class="fb"></p>
+    </div>
+
+    <div class="test" data-zone="tren-inferior">
+      <span class="tag">Tren inferior · estabilidad</span>
+      <h4>Equilibrio en una pierna, ojos cerrados</h4>
+      <p class="how">Parate en una sola pierna, manos en la cintura, y <em>cerrá los ojos</em>. Contá los
+      segundos hasta que tengas que apoyar el otro pie o abrir los ojos. Probá las dos piernas.</p>
+      <p class="red"><b>Bandera roja:</b> aguantás <b>menos de ~10 s</b>, o una pierna mucho peor que la otra
+      (control de tobillo/rodilla).</p>
+      <div class="opts">
+        <button data-v="0">+20 s, parejo</button>
+        <button data-v="1">10–20 s</button>
+        <button data-v="2">&lt;10 s o asimétrico</button>
+      </div>
+      <p class="fb"></p>
+    </div>
+
+    <div class="test" data-zone="core">
+      <span class="tag">Core · anti-rotación</span>
+      <h4>Plancha lateral</h4>
+      <p class="how">De costado, apoyado en el antebrazo, cuerpo recto, levantá la cadera y mantené la línea
+      hombro-cadera-tobillo. Cronometrá cuánto aguantás firme de cada lado.</p>
+      <p class="red"><b>Bandera roja:</b> menos de <b>~30 s</b>, la cadera se cae, o gran diferencia entre lados.</p>
+      <div class="opts">
+        <button data-v="0">+45 s, firme</button>
+        <button data-v="1">30–45 s</button>
+        <button data-v="2">&lt;30 s o asimétrico</button>
+      </div>
+      <p class="fb"></p>
+    </div>
+
+    <button id="resultBtn" disabled>Marcá los 4 tests para ver tu eslabón débil</button>
+
+    <div id="result">
+      <div class="resultcard">
+        <h3>Tu prioridad #1</h3>
+        <p class="big" id="resultZone">—</p>
+        <p id="resultText">—</p>
+        <span class="next" id="resultNext"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ask">
+    <b>👋 Soy tu profe.</b> Cuando tengas tu eslabón débil, decímelo y armo la <b>Lección 2</b> apuntada
+    justo a esa zona, con ejercicios que entren en tus 2 sesiones semanales. ¿Dudas con algún test? ¿Ya
+    tuviste alguna lesión que deberíamos tener en cuenta? <b>Preguntame lo que sea.</b>
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">Revisión sistemática — <cite>“Risk Factors and Prevention of Musculoskeletal Injuries in
+        Adolescent and Adult High-Performance Tennis Players”</cite> (2025).
+        <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12568103/">PMC12568103</a>.
+        Distribución de lesiones, factores de riesgo y carga aguda:crónica.</li>
+      <li id="r2">Hip strength &amp; groin injuries en tenistas de élite + <cite>Current Clinical Concepts:
+        Load Management of Adductor-Related Groin Pain</cite>.
+        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10569248/">PMC10569248</a>.
+        Déficit de fuerza de aductores y desaceleración.</li>
+    </ol>
+    <p>Más fuentes y comunidades en <a href="../RESOURCES.md">RESOURCES.md</a>. Terminología en
+    <a href="../GLOSSARY.md">GLOSSARY.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <a href="../MISSION.md">↗ Misión</a>
+      <a href="0002-fuga-cadena-saque.html">Lección 2 →</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const tests = Array.from(document.querySelectorAll('.test'));
+  const btn = document.getElementById('resultBtn');
+  const result = document.getElementById('result');
+  const answered = {};
+
+  const fbText = {
+    "0":"✅ Sólido. Mantenelo, no es tu prioridad ahora.",
+    "1":"🟡 En zona de atención. Vale reforzarlo, pero no es urgente.",
+    "2":"🔴 Acá hay margen real. Candidato fuerte a ser tu foco."
+  };
+
+  const zoneInfo = {
+    "hombro":{name:"Hombro (manguito rotador + escápula)",
+      text:"Tu rotación interna está comprometida. El objetivo: recuperar rango, fortalecer rotadores externos y controlar la escápula — el clásico kit anti-lesión de saque.",
+      next:"Próxima lección: rutina de hombro de tenista"},
+    "cadera":{name:"Cadera y aductores",
+      text:"Los aductores flojos o asimétricos son de los tirones más frecuentes del tenista. El objetivo: fuerza progresiva de aductores y glúteo (estilo Copenhagen).",
+      next:"Próxima lección: cadera y aductores a prueba de tirones"},
+    "tren-inferior":{name:"Tren inferior y estabilidad",
+      text:"Tu control de tobillo/rodilla en apoyo es tu punto débil — justo donde ocurren las lesiones agudas. El objetivo: fuerza unilateral, equilibrio y aterrizajes.",
+      next:"Próxima lección: tren inferior y desaceleración"},
+    "core":{name:"Core anti-rotación",
+      text:"Tu tronco no estabiliza bien la rotación, y eso descarga en la lumbar. El objetivo: anti-rotación y control de la desaceleración del swing.",
+      next:"Próxima lección: core anti-rotación para el swing"}
+  };
+
+  tests.forEach(test=>{
+    const zone = test.dataset.zone;
+    const fb = test.querySelector('.fb');
+    test.querySelectorAll('.opts button').forEach(b=>{
+      b.addEventListener('click',()=>{
+        test.querySelectorAll('.opts button').forEach(x=>x.classList.remove('sel'));
+        b.classList.add('sel');
+        const v = b.dataset.v;
+        answered[zone] = parseInt(v,10);
+        fb.textContent = fbText[v];
+        fb.classList.add('show');
+        if(Object.keys(answered).length === tests.length){
+          btn.disabled = false;
+          btn.textContent = "Ver mi eslabón débil →";
+        }
+      });
+    });
+  });
+
+  btn.addEventListener('click',()=>{
+    // pick highest score; tie-break by injury-frequency priority order
+    const order = ["cadera","tren-inferior","hombro","core"]; // tren inferior y aductores pesan más epidemiológicamente
+    let best=null, bestScore=-1;
+    order.forEach(z=>{
+      const s = answered[z] ?? 0;
+      if(s > bestScore){ bestScore = s; best = z; }
+    });
+    const info = zoneInfo[best];
+    document.getElementById('resultZone').textContent = info.name;
+    let lead = bestScore>=2 ? "Tu test más flojo apunta acá. " : (bestScore===1 ? "Sin alarmas grandes; el margen más claro está acá. " : "¡Buen estado general! Para afinar, empezá por acá. ");
+    document.getElementById('resultText').textContent = lead + info.text;
+    document.getElementById('resultNext').textContent = "→ " + info.next;
+    result.classList.add('show');
+    result.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+})();
+</script>
+</body>
+</html>

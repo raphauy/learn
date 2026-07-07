@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Referencia — Autoevaluación física del tenista</title>
+<style>
+  :root{--ink:#1c2a35;--soft:#5a6b78;--line:#d8dee2;--accent:#0b7a5a;--bad:#b91c1c;--warn:#b45309;--good:#15803d}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .sheet{max-width:780px;margin:0 auto;padding:36px 30px 60px}
+  .head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid var(--accent);padding-bottom:12px;margin-bottom:8px}
+  h1{font-size:25px;margin:0;letter-spacing:-.3px}
+  .head .meta{text-align:right;font-size:12px;color:var(--soft)}
+  .intro{font-size:13.5px;color:var(--soft);margin:10px 0 22px}
+  table{width:100%;border-collapse:collapse;margin:0 0 8px;font-size:13.5px}
+  thead th{background:#f0f6f3;text-align:left;padding:9px 10px;font-size:11px;letter-spacing:.06em;
+    text-transform:uppercase;color:#274a40;border:1px solid var(--line)}
+  td{border:1px solid var(--line);padding:9px 10px;vertical-align:top}
+  td.zone{font-weight:700;width:120px}
+  .how{color:var(--ink)}
+  .scale{font-size:12px;color:var(--soft);margin-top:4px}
+  .g{color:var(--good);font-weight:700}.y{color:var(--warn);font-weight:700}.r{color:var(--bad);font-weight:700}
+  h2{font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin:30px 0 8px}
+  .log{font-size:13px}
+  .log th,.log td{text-align:center}
+  .log td:first-child{text-align:left;font-weight:600}
+  .blank{height:30px}
+  .legend{font-size:12px;color:var(--soft);margin-top:6px}
+  .tip{background:#fff7ed;border:1px solid #fed7aa;border-left:4px solid #c2410c;border-radius:8px;
+    padding:11px 14px;font-size:13px;margin:22px 0}
+  .tip b{color:#c2410c}
+  footer{margin-top:30px;border-top:1px solid var(--line);padding-top:12px;font-size:12px;color:var(--soft)}
+  a{color:var(--accent)}
+  @media print{.sheet{padding:0 8px} .tip{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    thead th,.tip{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="head">
+    <h1>Autoevaluación física del tenista</h1>
+    <div class="meta">Referencia · Prevención de lesiones<br>Repetir cada 4 semanas</div>
+  </div>
+  <p class="intro">Cuatro mini-tests para encontrar tu <b>eslabón débil</b>. Sin equipo (solo una pared
+  y una silla). Anotá el resultado abajo y reevaluá cada mes: lo que mejora deja de ser prioridad.
+  Acompaña la <a href="../lessons/0001-mapa-lesiones-y-eslabon-debil.html">Lección 1</a>.</p>
+
+  <table>
+    <thead>
+      <tr><th>Zona</th><th>Test</th><th>Cómo · y bandera roja</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="zone">Hombro<br><span style="font-weight:400;color:var(--soft);font-size:12px">rotación interna</span></td>
+        <td class="how">Mano a la espalda</td>
+        <td>Mano por detrás de la espalda hacia arriba, dominante vs no dominante.
+          <div class="scale"><span class="g">Verde</span> simétrico · <span class="y">Amarillo</span> leve diferencia · <span class="r">Rojo</span> dominante mucho más abajo (GIRD)</div></td>
+      </tr>
+      <tr>
+        <td class="zone">Cadera<br><span style="font-weight:400;color:var(--soft);font-size:12px">aductores</span></td>
+        <td class="how">Apretón de aductores</td>
+        <td>Boca arriba, rodillas flexionadas, puños/pelota entre rodillas, apretar 5 s × 5.
+          <div class="scale"><span class="g">Verde</span> fuerte, sin molestia · <span class="y">Amarillo</span> algo débil/tirante · <span class="r">Rojo</span> débil o duele la ingle</div></td>
+      </tr>
+      <tr>
+        <td class="zone">Tren inferior<br><span style="font-weight:400;color:var(--soft);font-size:12px">estabilidad</span></td>
+        <td class="how">Una pierna, ojos cerrados</td>
+        <td>Parado en una pierna, manos en cintura, ojos cerrados. Contar segundos. Ambas piernas.
+          <div class="scale"><span class="g">Verde</span> +20 s parejo · <span class="y">Amarillo</span> 10–20 s · <span class="r">Rojo</span> &lt;10 s o asimétrico</div></td>
+      </tr>
+      <tr>
+        <td class="zone">Core<br><span style="font-weight:400;color:var(--soft);font-size:12px">anti-rotación</span></td>
+        <td class="how">Plancha lateral</td>
+        <td>De costado, antebrazo, cuerpo recto, cadera arriba. Cronometrar cada lado.
+          <div class="scale"><span class="g">Verde</span> +45 s firme · <span class="y">Amarillo</span> 30–45 s · <span class="r">Rojo</span> &lt;30 s o asimétrico</div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Registro de seguimiento</h2>
+  <table class="log">
+    <thead>
+      <tr><th>Zona</th><th>Fecha ___</th><th>Fecha ___</th><th>Fecha ___</th><th>Fecha ___</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Hombro (mano a la espalda)</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Aductores (apretón)</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Equilibrio 1 pierna (seg)</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Plancha lateral (seg)</td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table>
+  <p class="legend">Anotá V / A / R (o los segundos). Tu <b>prioridad</b> es la zona más “Roja”; en empate,
+  pesan más cadera y tren inferior (donde ocurren la mayoría de las lesiones de tenis).</p>
+
+  <div class="tip">
+    <b>Regla de oro de la carga:</b> no subas tu volumen de juego + gym más de ~10% por semana. El salto
+    brusco de carga es el predictor de lesión más fuerte que existe. Más vale constante que heroico.
+  </div>
+
+  <footer>
+    Basado en <cite>Risk Factors and Prevention of Musculoskeletal Injuries… in Tennis Players</cite> (PMC12568103)
+    y la literatura de aductores/ingle (PMC10569248). Detalle de fuentes en
+    <a href="../RESOURCES.md">RESOURCES.md</a>. · Esto es prevención, no diagnóstico: si hay dolor agudo, consultá a un profesional.
+  </footer>
+
+</div>
+</body>
+</html>

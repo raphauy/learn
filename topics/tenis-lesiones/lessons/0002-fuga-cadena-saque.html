@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lección 2 — Por qué el saque te castiga el brazo (y cómo cortar la fuga)</title>
+<style>
+  :root{
+    --ink:#1c2a35; --soft:#5a6b78; --line:#e3e8ec; --bg:#fbfaf7;
+    --accent:#0b7a5a; --accent2:#c2410c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(20,40,55,.07),0 8px 24px rgba(20,40,55,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-size:33px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:#f0f6f3; border:1px solid #d4e7df; border-radius:12px; font-size:15px; color:#274a40}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:46px 0 12px; letter-spacing:-.2px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px}
+  cite{font-style:italic}
+
+  /* safety box */
+  .safety{background:#fef2f2; border:1px solid #fecaca; border-left:5px solid var(--bad);
+    border-radius:12px; padding:16px 20px; margin:26px 0}
+  .safety h3{margin:0 0 8px; font-size:16px; color:var(--bad); display:flex; align-items:center; gap:8px}
+  .safety p{margin:0 0 8px; font-size:15px}
+  .safety ul{margin:6px 0 0; padding-left:20px; font-size:14.5px; color:#7f1d1d}
+  .safety li{margin-bottom:4px}
+
+  /* chain diagram */
+  .chain{display:flex; align-items:stretch; gap:0; margin:22px 0; border:1px solid var(--line);
+    border-radius:14px; overflow:hidden; background:var(--card); box-shadow:var(--shadow)}
+  .link{flex:1; padding:16px 12px; text-align:center; border-right:1px solid var(--line); position:relative}
+  .link:last-child{border-right:none}
+  .link .ico{font-size:24px}
+  .link .nm{font-weight:700; font-size:13.5px; margin-top:4px}
+  .link .role{font-size:11.5px; color:var(--soft); margin-top:2px; line-height:1.3}
+  .link.base{background:#ecfdf3}
+  .link.pay{background:#fff1ed}
+  .arrow{display:flex; align-items:center; color:#bcc; font-weight:700; padding:0 2px}
+
+  .levers{counter-reset:l; margin:18px 0}
+  .step{display:flex; gap:16px; background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:18px 20px; margin:14px 0; box-shadow:var(--shadow)}
+  .step .num{flex:none; width:34px; height:34px; border-radius:50%; background:var(--accent); color:#fff;
+    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:16px}
+  .step h4{margin:2px 0 6px; font-size:17px}
+  .step p{margin:0 0 8px; font-size:15px}
+  .step .mini{font-size:13.5px; color:var(--soft); background:#f6f8f9; border-radius:8px; padding:8px 12px; margin:0}
+
+  /* warmup checklist */
+  .routine{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:8px 6px; margin:14px 0; box-shadow:var(--shadow)}
+  .item{display:flex; gap:14px; align-items:flex-start; padding:14px 16px; border-bottom:1px solid var(--line); cursor:pointer; transition:background .12s}
+  .item:last-child{border-bottom:none}
+  .item:hover{background:#fafcfb}
+  .item .box{flex:none; width:24px; height:24px; border:2px solid #c9d4cf; border-radius:7px; margin-top:2px;
+    display:flex; align-items:center; justify-content:center; font-size:15px; color:#fff; transition:all .12s}
+  .item.done .box{background:var(--accent); border-color:var(--accent)}
+  .item.done .txt h5{text-decoration:line-through; color:var(--soft)}
+  .item .txt h5{margin:0 0 3px; font-size:15.5px}
+  .item .txt p{margin:0; font-size:13.5px; color:var(--soft)}
+  .progress{padding:14px 16px; font-size:14px; font-weight:600; color:var(--accent); text-align:center}
+  .progress.full{color:#fff; background:var(--accent); border-radius:0 0 12px 12px}
+
+  .callout{background:#f0f6f3; border:1px solid #d4e7df; border-left:4px solid var(--accent);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px; color:#274a40}
+  .callout b{color:var(--accent)}
+
+  .next{background:#fff7ed; border:1px solid #fed7aa; border-radius:12px; padding:18px 20px; margin:30px 0}
+  .next h4{margin:0 0 6px; color:var(--accent2); font-size:16px}
+  .next p{margin:0; font-size:15px}
+
+  .ask{margin:40px 0 0; padding:18px 22px; background:#f0f6f3; border:1px solid #d4e7df; border-radius:14px; font-size:15.5px; color:#274a40}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    h1{font-size:27px}
+    .chain{flex-wrap:wrap}
+    .link{flex:1 0 40%; border-bottom:1px solid var(--line)}
+  }
+  @media print{
+    body{background:#fff}
+    .item .box{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .safety,.next,.callout{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .step,.chain,.routine{box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Lección 2 · Prevención de lesiones en tenis</p>
+  <h1>Por qué el saque te castiga el brazo<br>(y cómo cortar la fuga)</h1>
+  <p class="sub">Una idea que lo cambia todo: el dolor de hombro/codo/muñeca al sacar casi nunca empieza en el brazo.</p>
+
+  <div class="mission">
+    <span>🎯</span>
+    <div><b>Para vos, hoy:</b> me contaste dolor leve pero persistente en <b>hombro, antebrazo y muñeca al sacar</b>,
+    y tu autoevaluación marcó el <b>tren inferior</b> como eslabón débil. No es casualidad: esta lección une las dos cosas.</div>
+  </div>
+
+  <div class="safety">
+    <h3>⚠️ Primero, lo importante</h3>
+    <p>Un dolor que ya lleva <b>un par de meses</b> y aparece en <b>tres zonas</b> (hombro, antebrazo, muñeca)
+    merece un <b>chequeo puntual con un kinesiólogo o médico deportólogo</b>. No es para asustarte —es leve—,
+    es para descartar y entrenar tranquilo. Es la jugada de mayor retorno y menor riesgo que tenés ahora.</p>
+    <p style="margin-bottom:2px"><b>Frená y consultá sí o sí si aparece:</b></p>
+    <ul>
+      <li>Hormigueo, adormecimiento o debilidad en la mano o los dedos.</li>
+      <li>Dolor que te despierta de noche o que está presente en reposo.</li>
+      <li>Pérdida clara de fuerza o de rango, o dolor que va en aumento.</li>
+    </ul>
+    <p style="margin:8px 0 0">Esta lección es <b>prevención y educación</b>: bajar carga y calentar. Nada de
+    cargar fuerte sobre algo que duele. <b>Regla única: nada que genere dolor.</b></p>
+  </div>
+
+  <p class="lede">El saque es el gesto más violento del tenis para el brazo. Pero el brazo es el último
+  eslabón de una cadena que arranca en el piso. Entender eso es la diferencia entre tapar síntomas y
+  resolver la causa.</p>
+
+  <h2>1 · El saque es una cadena, del piso a la pelota</h2>
+  <p>Un saque potente no lo hace el brazo: lo hace una <a href="../GLOSSARY.md">cadena cinética</a> que
+  acumula y transfiere energía de abajo hacia arriba —piernas que flexionan, cadera y tronco que rotan—
+  y recién al final el hombro rota, el codo se extiende y la muñeca acelera la raqueta.<sup><a href="#r2">2</a></sup></p>
+
+  <div class="chain" aria-label="Cadena cinética del saque">
+    <div class="link base"><div class="ico">🦵</div><div class="nm">Piernas</div><div class="role">flexión de rodilla, empuje del piso</div></div>
+    <div class="arrow">→</div>
+    <div class="link base"><div class="ico">🌀</div><div class="nm">Cadera + tronco</div><div class="role">rotan y generan torque</div></div>
+    <div class="arrow">→</div>
+    <div class="link pay"><div class="ico">💪</div><div class="nm">Hombro</div><div class="role">rotación interna</div></div>
+    <div class="arrow">→</div>
+    <div class="link pay"><div class="ico">🎾</div><div class="nm">Codo · muñeca</div><div class="role">extienden y aceleran</div></div>
+  </div>
+  <p style="font-size:14px;color:var(--soft);margin-top:-4px">Verde = motores grandes que generan fuerza ·
+  Naranja = articulaciones chicas que la transmiten (y pagan la cuenta si falta fuerza abajo).</p>
+
+  <h2>2 · La fuga: cuando abajo no aporta, arriba paga</h2>
+  <p>Acá está la idea central. Si un eslabón de abajo no pone su parte —piernas o core débiles, fatiga
+  al final del partido, o técnica— esa fuerza que falta <b>no desaparece</b>: la terminan poniendo las
+  articulaciones chicas de arriba. Es una <a href="../GLOSSARY.md">fuga de la cadena cinética</a>, y el
+  hombro, el codo y la muñeca se sobrecargan para compensar.<sup><a href="#r2">2</a></sup></p>
+  <p>Por eso casi todas las lesiones de brazo en tenis son <a href="../GLOSSARY.md">crónicas y por sobreuso</a>,
+  no de un golpe.<sup><a href="#r1">1</a></sup> Y por eso el dato más útil para vos: cuando los jugadores
+  <b>flexionan más las rodillas y usan las piernas</b>, la carga sobre el hombro y el codo <b>baja</b>.<sup><a href="#r2">2</a></sup></p>
+
+  <div class="callout">
+    <b>Tu caso, conectado:</b> tu test marcó el <b>tren inferior/estabilidad</b> como eslabón débil, y el año
+    pasado tuviste un <b>desgarro de cuádriceps</b>. Es muy probable que parte de tu fuga esté ahí abajo: tu
+    brazo está compensando lo que las piernas y el core no terminan de aportar en el saque. Fortalecer abajo
+    no es “otro tema” — <b>es proteger tu hombro</b>.
+  </div>
+
+  <h2>3 · Qué hacer ahora (todo seguro, sin dolor)</h2>
+  <p>Tres palancas para que el cuerpo se ponga al día y el síntoma no escale. Ninguna te hace cargar sobre lo que duele.</p>
+
+  <div class="levers">
+    <div class="step">
+      <div class="num">1</div>
+      <div>
+        <h4>Bajá la carga del saque, temporalmente</h4>
+        <p>El predictor de lesión más fuerte es el <b>salto de carga</b>. Si el dolor repuntó, recortá
+        volumen de saque unas semanas (menos saques por sesión, menos sesiones de saque) y volvé a subir
+        de a poco: no más de ~10% por semana.<sup><a href="#r1">1</a></sup></p>
+        <p class="mini">No es dejar de jugar. Es dosificar el gesto que más castiga, hasta que el tejido se ponga al día.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num">2</div>
+      <div>
+        <h4>Calentá el brazo ANTES de sacar</h4>
+        <p>Nunca tu primer saque en frío debería ir al 100%. Una mini-rutina de 3–4 minutos prepara el
+        hombro y la muñeca y reduce el pico de carga del primer saque. Tenés la rutina abajo 👇</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num">3</div>
+      <div>
+        <h4>Usá las piernas en el saque</h4>
+        <p>Cue simple y respaldado: <b>flexioná más las rodillas</b> y empujá desde el piso. Más pierna =
+        menos demanda sobre hombro y codo.<sup><a href="#r2">2</a></sup> Es el primer paso para tapar tu fuga.</p>
+        <p class="mini">Esto es técnico, pero la <b>base de fuerza</b> que lo hace posible la construimos en el gym (Lección 4).</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Tu calentamiento pre-saque</h2>
+  <p>Hacé esto antes de empezar a sacar (en cancha, sin peso). <b>Tildá cada uno</b> — todos a intensidad
+  cómoda, <b>sin dolor</b>. Si alguno molesta, salteálo y avisame.</p>
+
+  <div class="routine" id="routine">
+    <div class="item">
+      <div class="box">✓</div>
+      <div class="txt"><h5>Círculos de brazo + péndulos · 30 s</h5><p>Brazos sueltos, círculos chicos a grandes; después colgá el brazo y hacé péndulos suaves.</p></div>
+    </div>
+    <div class="item">
+      <div class="box">✓</div>
+      <div class="txt"><h5>Rotación externa con banda · 10–12 lentas</h5><p>Codo al costado, banda liviana, abrí el antebrazo hacia afuera y volvé controlando. Despierta el manguito.</p></div>
+    </div>
+    <div class="item">
+      <div class="box">✓</div>
+      <div class="txt"><h5>Deslizamientos de escápula en pared · 8–10</h5><p>Espalda y brazos contra la pared, subí y bajá los brazos manteniendo contacto. Activa la base del hombro.</p></div>
+    </div>
+    <div class="item">
+      <div class="box">✓</div>
+      <div class="txt"><h5>Muñeca: círculos + flex/extensión suave · 30 s</h5><p>Movilidad de muñeca en todo el rango, sin forzar. Prepara el último eslabón.</p></div>
+    </div>
+    <div class="item">
+      <div class="box">✓</div>
+      <div class="txt"><h5>Saques progresivos · 50% → 70% → 85%</h5><p>5–6 saques subiendo intensidad de a poco antes de ir al 100%. Nunca el primero en frío al máximo.</p></div>
+    </div>
+    <div class="progress" id="progress">0 / 5 — listo para sacar cuando completes la rutina</div>
+  </div>
+
+  <div class="callout">
+    <b>Opcional, para el antebrazo (solo si NO duele):</b> un <a href="../GLOSSARY.md">isométrico</a> de
+    extensores —apoyá el antebrazo, muñeca por fuera del borde, y sostené una resistencia suave 30–45 s sin
+    moverte, 3–5 veces. En tendones irritados, el isométrico tiende a <b>calmar el dolor</b> y deja cargar sin
+    movimiento doloroso.<sup><a href="#r3">3</a></sup> Si tira o molesta, no es para hoy.
+  </div>
+
+  <div class="next">
+    <h4>Lo que viene (Lección 3)</h4>
+    <p>Cuando el síntoma esté calmo (y con el OK del profesional), armamos la <b>fuerza dirigida</b> que tapa
+    la fuga de verdad: manguito rotador + control de escápula, <a href="../GLOSSARY.md">excéntricos</a> de
+    antebrazo, y la base de piernas/core — todo en tus 2 sesiones de gym. Para afinarla necesito tu triage 👇.</p>
+  </div>
+
+  <div class="ask">
+    <b>👋 Tu profe.</b> Respondé las 3 preguntas que te dejé en el chat (dónde duele exacto, cuándo, y si hay
+    hormigueo/debilidad) y armo la Lección 3 a tu medida. Cualquier duda con un movimiento del calentamiento,
+    <b>preguntame</b>.
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">Revisión sistemática — <cite>Risk Factors and Prevention of Musculoskeletal Injuries… in Tennis Players</cite> (2025).
+        <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12568103/">PMC12568103</a>. Sobreuso del miembro superior y manejo de carga.</li>
+      <li id="r2">Cadena cinética del saque y descarga del brazo vía piernas/tronco —
+        <a href="https://tennisprehablab.com/2019/05/24/serve-kinetic-chain/">TennisPrehabLab: Serve Kinetic Chain</a>
+        y <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6542888/">Hand &amp; Wrist Injuries in Tennis (PMC6542888)</a>.</li>
+      <li id="r3">Tendinopatía lateral de codo: los isométricos tienen efecto analgésico; la carga se progresa gradualmente —
+        <a href="https://www.physio-pedia.com/Lateral_Epicondyle_Tendinopathy_Toolkit:_Section_E_-_Exercise_Prescription">Physiopedia: LET Toolkit (Exercise)</a>.</li>
+    </ol>
+    <p>Más fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Terminología en <a href="../GLOSSARY.md">GLOSSARY.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <a href="0001-mapa-lesiones-y-eslabon-debil.html">← Lección 1</a>
+      <a href="../reference/autoevaluacion-fisica-tenis.html">Autoevaluación</a>
+      <a href="0003-base-tren-inferior.html">Lección 3 →</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const items = Array.from(document.querySelectorAll('#routine .item'));
+  const prog = document.getElementById('progress');
+  const total = items.length;
+  function update(){
+    const done = items.filter(i=>i.classList.contains('done')).length;
+    if(done===total){ prog.textContent = "✓ ¡Listo! Brazo calentado — ahora sí, a sacar."; prog.classList.add('full'); }
+    else { prog.textContent = done + " / " + total + " — listo para sacar cuando completes la rutina"; prog.classList.remove('full'); }
+  }
+  items.forEach(i=> i.addEventListener('click', ()=>{ i.classList.toggle('done'); update(); }));
+})();
+</script>
+</body>
+</html>
