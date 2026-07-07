@@ -67,6 +67,8 @@ The lesson should teach ONE THING only. It should be completable very quickly - 
 
 Make opening a lesson as easy as possible — ideally a single CLI command the user can run to open the HTML file in their browser. Every lesson should also carry a link back to the home (`../../../index.html`) so the user can jump between topics.
 
+**Favicon.** Every HTML page you create in this workspace — lessons, reference docs, and the home — must carry the workspace favicon so browser tabs are recognisable. The exact markup (a self-contained `data:` URI, no external file) lives in [favicon-head.html](./favicon-head.html) in this skill folder — paste that whole line into the `<head>`, right after the `<meta name="viewport">`. It's a data URI on purpose, so each HTML file stays self-contained regardless of its folder depth. If you ever swap the favicon, update `favicon-head.html` and re-apply it to the existing pages.
+
 Each lesson should link via HTML anchors to other lessons and reference documents **within the same topic** (relative paths like `0002-...html`, `../GLOSSARY.md`, `../reference/...`). Cross-topic links are allowed but must use the full relative path (e.g. `../../other-topic/lessons/0001-...html`).
 
 ## The Mission (per topic)
