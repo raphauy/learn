@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
+<title>Cubo 1 — El cubo no tiene colores: tiene 20 piezas (y una brújula)</title>
+<style>
+  :root{
+    --ink:#1b2233; --soft:#5d6478; --line:#e4e6ef; --bg:#fbfaf9;
+    --accent:#e11d48; --accent-soft:#fff1f4; --accent-line:#fbcfda; --accent-ink:#9f1239;
+    --accent2:#ea580c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(24,28,55,.07),0 8px 24px rgba(24,28,55,.06);
+    /* colores reales del cubo */
+    --cW:#f7f7f5; --cY:#ffd500; --cR:#d21f1f; --cO:#ff6d00; --cB:#1769d6; --cG:#2fa84a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-size:33px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:12px; font-size:15px; color:var(--accent-ink)}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:46px 0 12px; letter-spacing:-.2px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px}
+  cite{font-style:italic}
+  em.q{font-style:italic; color:var(--accent-ink)}
+  code.mv{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:700;
+    background:#1b2233; color:#fff; padding:2px 8px; border-radius:7px; font-size:.92em; letter-spacing:.5px; white-space:nowrap}
+
+  /* piezas del cubo */
+  .pieces{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:22px 0}
+  .piece{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 16px; box-shadow:var(--shadow); text-align:center}
+  .piece .stk{display:flex; gap:4px; justify-content:center; margin-bottom:12px; height:34px; align-items:center}
+  .sq{width:26px; height:26px; border-radius:5px; border:1.5px solid rgba(0,0,0,.18); box-shadow:inset 0 -2px 4px rgba(0,0,0,.10)}
+  .piece .cnt{font-size:30px; font-weight:800; letter-spacing:-1px; line-height:1; color:var(--ink)}
+  .piece h4{margin:6px 0 4px; font-size:16px}
+  .piece p{margin:0; font-size:13px; color:var(--soft)}
+  .piece.fixed{border-color:var(--accent-line); background:linear-gradient(180deg,#fff6f8,#fff)}
+  .piece.fixed .cnt{color:var(--accent)}
+  .piece .badge{display:inline-block; margin-top:8px; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 9px; border-radius:999px}
+
+  .tally{display:flex; align-items:baseline; justify-content:center; gap:10px; flex-wrap:wrap; margin:8px 0 2px; font-size:15px; color:var(--soft)}
+  .tally b{font-size:22px; color:var(--ink); font-weight:800}
+  .tally .hl{color:var(--accent)}
+
+  .callout{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px}
+  .callout b{color:var(--accent2)}
+  .note{background:var(--accent-soft); border:1px solid var(--accent-line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15px; color:var(--accent-ink)}
+  .note b{color:var(--accent)}
+
+  /* notación */
+  .moves{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:20px 0}
+  .move{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 12px; box-shadow:var(--shadow); text-align:center}
+  .move .lt{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:26px; color:var(--accent)}
+  .move .en{font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); font-weight:700; margin-top:2px}
+  .move .es{font-size:13px; color:var(--ink); margin-top:4px}
+  .mods{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin:14px 0 2px}
+  .mod{background:#fbfbfd; border:1px solid var(--line); border-radius:12px; padding:14px 12px; text-align:center}
+  .mod .ex{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:22px; color:var(--ink)}
+  .mod .ex b{color:var(--accent)}
+  .mod p{margin:6px 0 0; font-size:13px; color:var(--soft)}
+
+  /* práctica */
+  .practice{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:18px 0; box-shadow:var(--shadow)}
+  .practice .lbl{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .practice h3{margin:10px 0 4px; font-size:20px}
+  .algo{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:12px 0 4px; font-size:15px}
+  .algo .seq{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:20px; letter-spacing:1px;
+    background:#1b2233; color:#fff; padding:8px 14px; border-radius:10px}
+  .step{display:flex; gap:14px; align-items:flex-start; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line)}
+  .step .n{flex:none; width:28px; height:28px; border-radius:8px; background:var(--accent-soft); color:var(--accent);
+    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px}
+  .step b{font-size:15px}
+  .step p{margin:3px 0 0; font-size:13.5px; color:var(--soft)}
+  .winline{margin-top:16px; padding:12px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; font-size:14.5px; color:#14532d}
+  .winline b{color:var(--good)}
+
+  /* quiz */
+  .quiz{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:8px 8px 6px; margin:22px 0; box-shadow:var(--shadow); overflow:hidden}
+  .qhead{padding:16px 18px 6px}
+  .qhead h4{margin:0 0 2px; font-size:17px}
+  .qhead p{margin:0; font-size:13px; color:var(--soft)}
+  .q{padding:16px 18px; border-top:1px solid var(--line)}
+  .q .scn{font-size:15.5px; margin:0 0 12px}
+  .q .scn b{color:var(--accent-ink)}
+  .opt{display:block; width:100%; text-align:left; font:inherit; font-size:14.5px; color:var(--ink);
+    background:#fbfbfd; border:1.5px solid var(--line); border-radius:10px; padding:11px 14px; margin:8px 0; cursor:pointer; transition:all .12s}
+  .opt:hover{border-color:var(--accent-line); background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--good); background:#f0fdf4}
+  .opt.wrong{border-color:var(--bad); background:#fef2f2}
+  .fb{font-size:13.5px; margin:8px 2px 0; padding:11px 14px; border-radius:10px; display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0}
+  .fb.no{background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca}
+  .fb b{font-weight:800}
+  .qscore{padding:14px 18px; font-size:14.5px; font-weight:700; color:var(--accent); text-align:center; border-top:1px solid var(--line)}
+  .qscore.full{color:#fff; background:var(--accent)}
+
+  .ask{margin:40px 0 0; padding:18px 22px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:14px; font-size:15.5px; color:var(--accent-ink)}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    h1{font-size:27px}
+    .pieces,.moves,.mods{grid-template-columns:1fr}
+    .moves{grid-template-columns:1fr 1fr}
+  }
+  @media print{
+    body{background:#fff}
+    .piece,.move,.practice,.quiz{box-shadow:none}
+    .callout,.note,.piece.fixed{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Cubo de Rubik · Lección 1 · Fundamentos</p>
+  <h1>El cubo no tiene colores:<br>tiene 20 piezas y una brújula</h1>
+  <p class="sub">Arrancás de cero. Antes de girar nada, un cambio de mirada que separa a los que arman el cubo de los que lo revuelven para siempre.</p>
+
+  <div class="mission">
+    <span>🎯</span>
+    <div><b>Por qué esta es TU lección.</b> Tu meta es armarlo <em class="q">siempre, de memoria, sin mirar guía</em> —que
+    sea un skill tuyo, no suerte. Eso solo es posible por un motivo enorme y poco obvio: <b>el cubo es un mecanismo
+    determinista, no un juego de azar</b>. No hay suerte que memorizar. Hoy te doy las dos herramientas sobre las que se
+    apoya todo lo demás: <b>ver piezas</b> (no colores) y <b>la notación</b> (el idioma para dar instrucciones exactas).</div>
+  </div>
+
+  <p class="lede">Casi todo el mundo mira el cubo y ve <b>6 caras de colores que se deslizan</b>. Con esa idea, el cubo
+  es imposible: son 43 trillones de combinaciones.<sup><a href="#r3">3</a></sup> Los que lo arman ven otra cosa —y es un
+  cambio de lente, no de talento.</p>
+
+  <h2>1 · No son colores sueltos. Son piezas.</h2>
+  <p>Lo que gira en un cubo <b>no son stickers ni caras</b>: son <b>piezas enteras</b> (cubies), cada una con sus colores
+  pegados y fijos entre sí. Y hay solo tres tipos, según cuántos stickers tienen:<sup><a href="#r2">2</a></sup></p>
+
+  <div class="pieces">
+    <div class="piece fixed">
+      <div class="stk"><span class="sq" style="background:var(--cB)"></span></div>
+      <div class="cnt">6</div>
+      <h4>Centros</h4>
+      <p>1 solo sticker. Uno por cara.</p>
+      <span class="badge">No se mueven</span>
+    </div>
+    <div class="piece">
+      <div class="stk"><span class="sq" style="background:var(--cB)"></span><span class="sq" style="background:var(--cW)"></span></div>
+      <div class="cnt">12</div>
+      <h4>Aristas</h4>
+      <p>2 stickers. En cada borde.</p>
+    </div>
+    <div class="piece">
+      <div class="stk"><span class="sq" style="background:var(--cB)"></span><span class="sq" style="background:var(--cW)"></span><span class="sq" style="background:var(--cR)"></span></div>
+      <div class="cnt">8</div>
+      <h4>Esquinas</h4>
+      <p>3 stickers. En cada vértice.</p>
+    </div>
+  </div>
+
+  <div class="tally">
+    <span><b>6</b> centros</span><span>+</span><span><b>12</b> aristas</span><span>+</span><span><b>8</b> esquinas</span>
+    <span>=</span><span><b>26</b> piezas, pero solo <b class="hl">20 se mueven</b></span>
+  </div>
+
+  <p>Ese solo cambio ya reduce el problema: no manejás 54 stickers al azar, manejás <b>20 piezas</b> que hay que llevar a
+  su lugar y orientar. Todo método —incluido el CFOP que es tu destino— es una receta para ubicar esas 20 piezas por orden.</p>
+
+  <h2>2 · La brújula: los centros nunca se mueven</h2>
+  <p>Acá está el dato que lo cambia todo. Girás una cara y las aristas y esquinas viajan… pero <b>los 6 centros se quedan
+  siempre en el mismo lugar relativo</b>: giran sobre su eje, jamás cambian de vecino.<sup><a href="#r1">1</a></sup></p>
+
+  <div class="note">
+    <b>Consecuencia práctica:</b> el centro <b>define el color de su cara</b>. Si el centro de una cara es azul, esa cara
+    <em>es</em> la azul —resuelta o no. Por eso los centros son tu <b>brújula</b>: para saber dónde va cada pieza, mirás
+    de qué colores es y buscás los dos/tres centros que le corresponden. Nunca "movés un centro a otro lado": es imposible
+    y no hace falta.
+  </div>
+
+  <h2>3 · La notación: el idioma para dar instrucciones</h2>
+  <p>Para escribir y seguir cualquier receta (un <b>algoritmo</b>), el mundo usa un idioma común. Sostené el cubo quieto,
+  sin girarlo entero, y nombrá las 6 caras por su posición.<sup><a href="#r4">4</a></sup> <b>Una letra = girar esa cara
+  90° en sentido horario, mirándola de frente.</b></p>
+
+  <div class="moves">
+    <div class="move"><div class="lt">U</div><div class="en">Up</div><div class="es">arriba</div></div>
+    <div class="move"><div class="lt">D</div><div class="en">Down</div><div class="es">abajo</div></div>
+    <div class="move"><div class="lt">R</div><div class="en">Right</div><div class="es">derecha</div></div>
+    <div class="move"><div class="lt">L</div><div class="en">Left</div><div class="es">izquierda</div></div>
+    <div class="move"><div class="lt">F</div><div class="en">Front</div><div class="es">frente</div></div>
+    <div class="move"><div class="lt">B</div><div class="en">Back</div><div class="es">atrás</div></div>
+  </div>
+
+  <p>Y dos modificadores que le agregás a cualquier letra:</p>
+  <div class="mods">
+    <div class="mod"><div class="ex"><b>R</b></div><p>sola = 90° <b>horario</b> (mirando esa cara)</p></div>
+    <div class="mod"><div class="ex"><b>R'</b></div><p>prime = 90° <b>antihorario</b> (al revés)</p></div>
+    <div class="mod"><div class="ex"><b>R2</b></div><p>media vuelta = <b>180°</b> (da igual el lado)</p></div>
+  </div>
+  <div class="callout">
+    <b>El único truco que confunde:</b> "horario" es <em>desde la cara que estás girando</em>, no desde tu silla. Para
+    hacer <code class="mv">R'</code> (derecha antihorario) mirás la cara derecha de frente e imaginás el reloj ahí. Con
+    práctica sale solo; por ahora, girá despacio y verificá.
+  </div>
+
+  <h2>Practicá: probá que el cubo es determinista</h2>
+  <p>Nada demuestra mejor "esto se memoriza, no es azar" que esto. Vas a aprender el algoritmo más usado del cubo —el
+  <b>"sexy move"</b>, <code class="mv">R U R' U'</code>— y a comprobar en tu mano que es perfectamente cíclico.</p>
+
+  <div class="practice">
+    <span class="lbl">Hacelo con el cubo en la mano</span>
+    <h3>El sexy move, seis veces</h3>
+    <div class="algo"><span class="seq">R&nbsp; U&nbsp; R'&nbsp; U'</span> <span style="color:var(--soft)">← leelo: derecha, arriba, derecha-prime, arriba-prime</span></div>
+
+    <div class="step">
+      <div class="n">1</div>
+      <div><b>Partí de un cubo resuelto (o de como esté) y elegí un Frente.</b> Sostenelo quieto: la cara que mira a vos
+      es F, la de arriba U, la de tu derecha R. No vas a girar el cubo entero en toda la secuencia.</div>
+    </div>
+    <div class="step">
+      <div class="n">2</div>
+      <div><b>Ejecutá <code class="mv">R U R' U'</code> despacio, una letra por vez.</b> R = derecha horario · U = arriba
+      horario · R' = derecha antihorario · U' = arriba antihorario.
+      <p>Mirá cómo unas pocas piezas se van de lugar. Se "rompió" un poco. Bien: es reversible.</p></div>
+    </div>
+    <div class="step">
+      <div class="n">3</div>
+      <div><b>Repetí exactamente la misma secuencia hasta hacerla 6 veces en total.</b> Contá en voz alta. Sin cambiar el
+      agarre, sin girar el cubo.</div>
+    </div>
+    <div class="winline">
+      <b>Tu win de hoy:</b> a la sexta, el cubo vuelve <b>idéntico</b> a como empezó. No es magia ni suerte: el sexy move
+      tiene "orden 6". Acabás de comprobar en tu mano que el cubo es un mecanismo <b>determinista y memorizable</b> —el
+      cimiento de armarlo siempre de memoria. Si no volvió, te comiste o invertiste un giro: es la mejor práctica para
+      afinar la notación. Volvé a empezar.
+    </div>
+  </div>
+
+  <h2>Probate: ¿leés el idioma?</h2>
+  <p>Cuatro preguntas cortas. Feedback al toque; no hay penalización por probar.</p>
+
+  <div class="quiz" id="quiz">
+    <div class="qhead"><h4>Quiz de fundamentos</h4><p>Tocá una opción para ver por qué.</p></div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>1.</b> Tenés el cubo con la cara blanca hacia vos (blanca = Frente). El algoritmo dice <code class="mv">F</code>. ¿Qué hacés?</p>
+      <button class="opt" data-fb="Eso sería girar el cubo entero (un cambio de vista, no un movimiento de cara). F mueve solo UNA cara: la del frente.">Giro todo el cubo hacia la derecha.</button>
+      <button class="opt" data-fb="Exacto. F = Front = girar la cara del frente (acá la blanca) 90° en sentido horario, mirándola de frente. Una letra, una cara.">Giro la cara blanca 90° en sentido horario.</button>
+      <button class="opt" data-fb="Esa es U (Up). F es la cara que te mira a vos, no la de arriba.">Giro la cara de arriba 90°.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="2">
+      <p class="scn"><b>2.</b> Sabés que <code class="mv">R</code> gira la cara derecha en sentido horario. ¿Qué hace <code class="mv">R'</code> (R prime)?</p>
+      <button class="opt" data-fb="Eso sería R2 (media vuelta, 180°). El prime no cambia cuántos grados, cambia el SENTIDO.">Gira la cara derecha 180°.</button>
+      <button class="opt" data-fb="Ojo: R' sigue siendo la cara derecha, no la izquierda. Lo único que cambia es el sentido del giro.">Gira la cara izquierda en sentido horario.</button>
+      <button class="opt" data-fb="Sí. El prime (') invierte el sentido: R' = derecha 90° ANTIhorario. Misma cara, misma cantidad, sentido opuesto.">Gira la cara derecha 90° en sentido antihorario.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="0">
+      <p class="scn"><b>3.</b> Hacés <code class="mv">R U R' U'</code> seis veces seguidas, <b>sin equivocarte</b>, partiendo de un cubo resuelto. ¿Qué pasa?</p>
+      <button class="opt" data-fb="Correcto — y es el punto de toda la lección. El algoritmo es cíclico y determinista: 6 repeticiones lo devuelven exacto. Nada de azar.">Vuelve exactamente a como estaba: resuelto.</button>
+      <button class="opt" data-fb="No: justamente lo contrario. Un algoritmo hace SIEMPRE lo mismo. Repetirlo 6 veces no mezcla al azar, cierra el ciclo.">Queda mezclado de forma distinta cada vez.</button>
+      <button class="opt" data-fb="Cuidado con esta idea: un algoritmo no 'resuelve' un cubo cualquiera. Hace un efecto fijo. Sobre un cubo mezclado, R U R' U' x6 lo devuelve a ESE mismo estado mezclado.">Queda resuelto salga de donde salga, aunque estuviera mezclado.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>4.</b> Tu cubo tiene el centro azul en una cara y querés "mandar ese azul del centro a la cara de arriba". ¿Tiene sentido?</p>
+      <button class="opt" data-fb="Casi, pero el motivo no es la fuerza del imán ni el pegamento: es geométrico. Los centros están sujetos al núcleo y no cambian de posición entre sí.">No, porque el centro está pegado más fuerte que el resto.</button>
+      <button class="opt" data-fb="Exacto. Los centros no cambian de lugar relativo: son la brújula fija. La cara azul es la del centro azul, punto. No movés centros; movés las 20 piezas alrededor de ellos.">No: los centros nunca cambian de posición entre sí; son fijos.</button>
+      <button class="opt" data-fb="No hace falta ningún algoritmo: es imposible por diseño. Ningún giro reubica un centro respecto de los otros.">Sí, con el algoritmo correcto se puede reubicar un centro.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="qscore" id="qscore">0 / 4 — probá las cuatro</div>
+  </div>
+
+  <div class="ask">
+    <b>👋 Tu profe.</b> Ya tenés las dos herramientas base: <b>ver piezas con los centros de brújula</b> y <b>leer notación</b>.
+    Con eso, la <b>Lección 2</b> es el primer paso real de armado: la <b>cruz blanca</b> —llevar cuatro aristas a su lugar
+    leyendo los centros, sin romper nada. ¿Te cerró lo de "piezas, no colores"? ¿El sexy move te volvió a resolver a la
+    sexta? Si algo de la notación quedó raro (el sentido horario suele marear al principio), <b>preguntame acá mismo</b> y
+    lo desarmamos juntos antes de seguir.
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">Ruwix — <cite>How To Solve The Rubik's Cube: Beginners Method</cite>.
+        <a href="https://ruwix.com/the-rubiks-cube/how-to-solve-the-rubiks-cube-beginners-method/">ruwix.com</a>.
+        Anatomía del cubo y la regla de que los centros están fijos y definen el color de cada cara.</li>
+      <li id="r2">Estructura de piezas del 3x3: 6 centros (1 sticker) + 12 aristas (2 stickers) + 8 esquinas (3 stickers) =
+        26 piezas; 20 móviles. Ver <a href="https://ruwix.com/the-rubiks-cube/">ruwix.com/the-rubiks-cube</a>.</li>
+      <li id="r3">Número de combinaciones del 3x3: 43.252.003.274.489.856.000 (~43 trillones, escala corta).
+        <a href="https://ruwix.com/the-rubiks-cube/mathematics-of-the-rubiks-cube-permutation-group/">ruwix.com — matemática del cubo</a>.</li>
+      <li id="r4">J Perm (Dylan Wang) — <cite>Rubik's Cube Move Notation</cite>.
+        <a href="https://www.jperm.net/3x3/moves">jperm.net/3x3/moves</a>.
+        <cite>"U, D, R, L, F, B… turn that side clockwise, as if you were facing that side"</cite>; el apóstrofo = sentido
+        contrario; el 2 = girar dos veces.</li>
+    </ol>
+    <p>Más fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Términos en <a href="../GLOSSARY.md">GLOSSARY.md</a> · Tu misión en <a href="../MISSION.md">MISSION.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <span style="color:#b9bdd0">Cubo · Lección 1 (primera del tema)</span>
+      <span style="color:#b9bdd0">Próxima · La cruz blanca (en construcción)</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const quiz = document.getElementById('quiz');
+  const qs = Array.from(quiz.querySelectorAll('.q'));
+  const scoreEl = document.getElementById('qscore');
+  const answered = new Array(qs.length).fill(false);
+
+  qs.forEach((q, qi) => {
+    const correct = parseInt(q.dataset.correct, 10);
+    const opts = Array.from(q.querySelectorAll('.opt'));
+    const fb = q.querySelector('.fb');
+    opts.forEach((opt, oi) => {
+      opt.addEventListener('click', () => {
+        const isRight = (oi === correct);
+        opt.classList.add(isRight ? 'right' : 'wrong');
+        fb.textContent = opt.dataset.fb;
+        fb.className = 'fb show ' + (isRight ? 'ok' : 'no');
+        if(!answered[qi]){
+          answered[qi] = isRight ? 'ok' : 'seen';
+          update();
+        }
+        if(isRight){
+          opts.forEach(o => o.disabled = true);
+        }
+      });
+    });
+  });
+
+  function update(){
+    const right = answered.filter(a => a === 'ok').length;
+    if(right === qs.length){
+      scoreEl.textContent = "✓ Las cuatro. Ya ves piezas y leés notación: listo para armar la cruz blanca.";
+      scoreEl.classList.add('full');
+    } else {
+      scoreEl.textContent = right + " / " + qs.length + " resueltas — seguí probando";
+      scoreEl.classList.remove('full');
+    }
+  }
+})();
+</script>
+</body>
+</html>

@@ -87,9 +87,6 @@
   .matlink:hover{color:var(--ink); border-color:var(--tc-accent); background:var(--tc-soft)}
   .matlink .ic{color:var(--tc-accent); font-weight:800}
 
-  footer.foot-note{margin-top:52px; padding-top:20px; border-top:1px solid var(--line); font-size:14px; color:var(--faint)}
-  footer.foot-note code{background:#eef0f5; padding:2px 7px; border-radius:6px; font-size:13px; color:var(--soft)}
-
   .hidden{display:none !important}
   @media (max-width:520px){
     .wrap{padding:40px 16px 60px}
@@ -129,11 +126,6 @@
     <div class="section-label">Material del tema</div>
     <div class="matlinks" id="t-material"></div>
   </section>
-
-  <footer class="foot-note">
-    Creado con el skill <code>/teach</code>. Para agregar un tema o una lección, pedíselo al agente
-    — mantiene esta página y las carpetas de cada tema.
-  </footer>
 </div>
 
 <script>
@@ -168,6 +160,18 @@ const TOPICS = [
     dir: "topics/tenis-tactica",
     lessons: [
       { n: 1, file: "lessons/0001-subir-de-altitud.html", title: "Subí de altitud: el partido es una estructura, no una fila de pelotas" }
+    ],
+    refs: []
+  },
+  {
+    slug: "cubo-rubik",
+    emoji: "🧩",
+    title: "Armar el cubo de Rubik",
+    subtitle: "De cero a armarlo siempre de memoria, entendiendo el porqué — rumbo a la velocidad.",
+    accent: "#e11d48", accentSoft: "#fff1f4", accentLine: "#fbcfda",
+    dir: "topics/cubo-rubik",
+    lessons: [
+      { n: 1, file: "lessons/0001-anatomia-y-notacion.html", title: "El cubo no tiene colores: tiene 20 piezas y una brújula" }
     ],
     refs: []
   }
