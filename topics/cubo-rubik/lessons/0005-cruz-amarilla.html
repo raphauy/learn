@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
+<title>Cubo 5 — La cruz amarilla: orientar las aristas de arriba (un solo algoritmo)</title>
+<style>
+  :root{
+    --ink:#1b2233; --soft:#5d6478; --line:#e4e6ef; --bg:#fbfaf9;
+    --accent:#e11d48; --accent-soft:#fff1f4; --accent-line:#fbcfda; --accent-ink:#9f1239;
+    --accent2:#ea580c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(24,28,55,.07),0 8px 24px rgba(24,28,55,.06);
+    --cW:#f7f7f5; --cY:#ffd500; --cR:#d21f1f; --cO:#ff6d00; --cB:#1769d6; --cG:#2fa84a; --cGray:#e9ebf1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-size:33px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:12px; font-size:15px; color:var(--accent-ink)}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:46px 0 12px; letter-spacing:-.2px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px}
+  cite{font-style:italic}
+  em.q{font-style:italic; color:var(--accent-ink)}
+  code.mv{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:700;
+    background:#1b2233; color:#fff; padding:2px 8px; border-radius:7px; font-size:.92em; letter-spacing:.5px; white-space:nowrap}
+
+  /* algoritmo destacado */
+  .trigger{display:flex; gap:14px; align-items:center; flex-wrap:wrap; justify-content:center;
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin:20px 0; box-shadow:var(--shadow)}
+  .trigger .seq{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:24px; letter-spacing:1.5px;
+    background:#1b2233; color:#fff; padding:12px 18px; border-radius:12px}
+  .trigger .lab{font-size:14px; color:var(--soft); max-width:34ch}
+  .trigger .lab b{color:var(--accent)}
+
+  /* estados de la cara de arriba */
+  .states{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:20px 0}
+  .state{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 10px 12px; box-shadow:var(--shadow); text-align:center}
+  .face{display:inline-grid; grid-template-columns:repeat(3,26px); grid-template-rows:repeat(3,26px); gap:3px}
+  .face .c{border-radius:5px; border:1px solid rgba(0,0,0,.08)}
+  .cy{background:var(--cY)} .cx{background:var(--cGray)}
+  .state h4{margin:10px 0 3px; font-size:14.5px}
+  .state p{margin:0; font-size:12px; color:var(--soft); line-height:1.45}
+  .state .hold{display:block; margin-top:5px; font-weight:700; color:var(--accent-ink)}
+  .arrow{font-size:20px; color:var(--accent); text-align:center; margin:2px 0}
+
+  /* descomposición del algoritmo */
+  .cycle{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:18px 0}
+  .cyc{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 14px; box-shadow:var(--shadow); text-align:center}
+  .cyc .ico{font-size:20px; font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800}
+  .cyc h4{margin:8px 0 4px; font-size:15.5px}
+  .cyc p{margin:0; font-size:13px; color:var(--soft)}
+
+  .callout{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px}
+  .callout b{color:var(--accent2)}
+  .note{background:var(--accent-soft); border:1px solid var(--accent-line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15px; color:var(--accent-ink)}
+  .note b{color:var(--accent)}
+
+  /* práctica / pasos */
+  .practice{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:18px 0; box-shadow:var(--shadow)}
+  .practice .lbl{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .practice h3{margin:10px 0 4px; font-size:20px}
+  .step{display:flex; gap:14px; align-items:flex-start; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line)}
+  .step:first-of-type{border-top:none}
+  .step .n{flex:none; width:28px; height:28px; border-radius:8px; background:var(--accent-soft); color:var(--accent);
+    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px}
+  .step b{font-size:15px}
+  .step p{margin:3px 0 0; font-size:13.5px; color:var(--soft)}
+  .step ul{margin:6px 0 0; padding-left:18px; font-size:13.5px; color:var(--soft)}
+  .step li{margin-bottom:4px}
+  .step li b{color:var(--ink)}
+  .winline{margin-top:16px; padding:12px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; font-size:14.5px; color:#14532d}
+  .winline b{color:var(--good)}
+
+  /* quiz */
+  .quiz{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:8px 8px 6px; margin:22px 0; box-shadow:var(--shadow); overflow:hidden}
+  .qhead{padding:16px 18px 6px}
+  .qhead h4{margin:0 0 2px; font-size:17px}
+  .qhead p{margin:0; font-size:13px; color:var(--soft)}
+  .q{padding:16px 18px; border-top:1px solid var(--line)}
+  .q .scn{font-size:15.5px; margin:0 0 12px}
+  .q .scn b{color:var(--accent-ink)}
+  .opt{display:block; width:100%; text-align:left; font:inherit; font-size:14.5px; color:var(--ink);
+    background:#fbfbfd; border:1.5px solid var(--line); border-radius:10px; padding:11px 14px; margin:8px 0; cursor:pointer; transition:all .12s}
+  .opt:hover{border-color:var(--accent-line); background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--good); background:#f0fdf4}
+  .opt.wrong{border-color:var(--bad); background:#fef2f2}
+  .fb{font-size:13.5px; margin:8px 2px 0; padding:11px 14px; border-radius:10px; display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0}
+  .fb.no{background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca}
+  .fb b{font-weight:800}
+  .qscore{padding:14px 18px; font-size:14.5px; font-weight:700; color:var(--accent); text-align:center; border-top:1px solid var(--line)}
+  .qscore.full{color:#fff; background:var(--accent)}
+
+  .ask{margin:40px 0 0; padding:18px 22px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:14px; font-size:15.5px; color:var(--accent-ink)}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    h1{font-size:27px}
+    .cycle{grid-template-columns:1fr}
+    .states{grid-template-columns:1fr 1fr}
+  }
+  @media print{
+    body{background:#fff}
+    .trigger,.cyc,.practice,.quiz,.state{box-shadow:none}
+    .callout,.note{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Cubo de Rubik · Lección 5 · Última capa</p>
+  <h1>La cruz amarilla:<br>orientar las aristas de arriba</h1>
+  <p class="sub">Empezás la última capa. Con un solo algoritmo —tu sexy move disfrazado— hacés que el amarillo de las 4 aristas mire hacia arriba y aparezca la cruz.</p>
+
+  <div class="mission">
+    <span>🎯</span>
+    <div><b>Por qué esta es TU lección.</b> Cerraste dos capas; entrás a la <b>última</b>. Y no hay que memorizar nada nuevo:
+    el algoritmo de hoy es el <code class="mv">R U R' U'</code> de siempre, envuelto entre <code class="mv">F</code> y <code class="mv">F'</code>.
+    Además aprendés a <b>leer 3 formas</b> en la cara de arriba y saber siempre qué hacer. Otro pilar del "de memoria".</div>
+  </div>
+
+  <p class="lede">Un concepto nuevo y clave: acá <b>orientás</b>, no ubicás. Solo te importa que el amarillo de las <b>4 aristas</b>
+  mire hacia arriba. <b>Ignorá las esquinas</b>, e ignorá si los brazos de la cruz coinciden con los centros — eso se arregla después.<sup><a href="#r1">1</a></sup></p>
+
+  <div class="note">
+    <b>Marco de siempre:</b> <b>blanco abajo, amarillo arriba</b> — no des vuelta nada. La cara de arriba (amarilla) es la que vas
+    a resolver. <b>Orientar ≠ ubicar:</b> una arista está "orientada" cuando su amarillo apunta al cielo, aunque esté en el lugar
+    equivocado. Hoy solo buscamos eso: cuatro amarillos arriba formando la cruz.
+  </div>
+
+  <h2>El algoritmo: tu sexy move en un sándwich</h2>
+  <p>Uno solo para toda la etapa.<sup><a href="#r2">2</a></sup> Miralo y reconocelo: es <code class="mv">R U R' U'</code> con
+  una <code class="mv">F</code> antes y una <code class="mv">F'</code> después.</p>
+
+  <div class="trigger">
+    <span class="seq">F R U R' U' F'</span>
+    <span class="lab">La rebanada de arriba: <code class="mv">F</code>. El relleno: tu <b>sexy move</b>
+    <code class="mv">R U R' U'</code>. La rebanada de abajo: <code class="mv">F'</code> (deshace la F). Fácil de recordar.</span>
+  </div>
+
+  <div class="cycle">
+    <div class="cyc"><div class="ico">F</div><h4>Abrís el frente</h4><p>Subís la cara de adelante para trabajar sobre ella.</p></div>
+    <div class="cyc"><div class="ico">R U R' U'</div><h4>Tu gesto de siempre</h4><p>El sexy move reorienta las aristas de arriba.</p></div>
+    <div class="cyc"><div class="ico">F'</div><h4>Cerrás el frente</h4><p>Devolvés la cara al lugar. Todo lo de abajo queda intacto.</p></div>
+  </div>
+
+  <h2>Leé la forma de arriba y sabé qué hacer</h2>
+  <p>Mirá <b>solo las aristas amarillas</b> de la cara de arriba (el centro siempre es amarillo). Vas a ver una de estas tres formas.
+  Sostené el cubo como indica cada una y aplicá el algoritmo:<sup><a href="#r2">2</a></sup></p>
+
+  <div class="states">
+    <div class="state">
+      <div class="face" aria-label="Punto: solo el centro amarillo">
+        <div class="c cx"></div><div class="c cx"></div><div class="c cx"></div>
+        <div class="c cx"></div><div class="c cy"></div><div class="c cx"></div>
+        <div class="c cx"></div><div class="c cx"></div><div class="c cx"></div>
+      </div>
+      <h4>Punto</h4>
+      <p>Ninguna arista amarilla, solo el centro.<span class="hold">Aplicá desde cualquier lado</span></p>
+    </div>
+    <div class="state">
+      <div class="face" aria-label="L: centro más aristas de atrás e izquierda">
+        <div class="c cx"></div><div class="c cy"></div><div class="c cx"></div>
+        <div class="c cy"></div><div class="c cy"></div><div class="c cx"></div>
+        <div class="c cx"></div><div class="c cx"></div><div class="c cx"></div>
+      </div>
+      <h4>L (codo)</h4>
+      <p>Dos aristas en ángulo.<span class="hold">Ponelas apuntando arriba-izquierda</span></p>
+    </div>
+    <div class="state">
+      <div class="face" aria-label="Línea horizontal">
+        <div class="c cx"></div><div class="c cx"></div><div class="c cx"></div>
+        <div class="c cy"></div><div class="c cy"></div><div class="c cy"></div>
+        <div class="c cx"></div><div class="c cx"></div><div class="c cx"></div>
+      </div>
+      <h4>Línea</h4>
+      <p>Dos aristas enfrentadas.<span class="hold">Ponela horizontal (izq↔der)</span></p>
+    </div>
+    <div class="state">
+      <div class="face" aria-label="Cruz amarilla completa">
+        <div class="c cx"></div><div class="c cy"></div><div class="c cx"></div>
+        <div class="c cy"></div><div class="c cy"></div><div class="c cy"></div>
+        <div class="c cx"></div><div class="c cy"></div><div class="c cx"></div>
+      </div>
+      <h4>✓ Cruz</h4>
+      <p>Las 4 aristas amarillas arriba. Meta cumplida.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>La regla infalible.</b> Aplicá el algoritmo y volvé a mirar la forma: nunca retrocede, siempre avanza
+    <b>punto → L o línea → cruz</b>. Desde el <b>punto</b> te va a tomar <b>dos pasadas</b> (aparece una L o una línea, y la resolvés
+    con su regla).<sup><a href="#r2">2</a></sup> Si aplicaste y no salió, no te trabaste: releé la forma nueva y repetí.
+  </div>
+
+  <div class="practice">
+    <span class="lbl">Hacelo con el cubo en la mano</span>
+    <h3>Formar la cruz amarilla</h3>
+
+    <div class="step">
+      <div class="n">1</div>
+      <div><b>Con las dos capas hechas, mirá la cara de arriba desde arriba.</b> Fijate solo en las <b>aristas</b> amarillas
+      (los 4 costados del centro). Ignorá esquinas y colores de los lados.</div>
+    </div>
+    <div class="step">
+      <div class="n">2</div>
+      <div><b>Identificá la forma:</b> punto, L o línea. Sostené el cubo según su regla:
+      <ul>
+        <li><b>Línea</b> → horizontal (izquierda↔derecha).</li>
+        <li><b>L</b> → las dos aristas apuntando arriba-izquierda (a "las 9 y las 12").</li>
+        <li><b>Punto</b> → cualquier orientación sirve.</li>
+      </ul></div>
+    </div>
+    <div class="step">
+      <div class="n">3</div>
+      <div><b>Aplicá <code class="mv">F R U R' U' F'</code> entero.</b> No cortes a la mitad. Al terminar, volvé a mirar la forma.</div>
+    </div>
+    <div class="step">
+      <div class="n">4</div>
+      <div><b>¿Todavía no es cruz?</b> Es esperable (sobre todo si arrancaste del punto). Releé la forma nueva, reorientá el cubo
+      según su regla y repetí. En 1 o 2 pasadas cae la cruz.</div>
+    </div>
+
+    <div class="winline">
+      <b>Tu win de hoy:</b> una <b>cruz amarilla</b> arriba (centro + 4 aristas). Es totalmente normal que los <b>brazos</b> de la
+      cruz NO coincidan todavía con los centros de los lados, y que las esquinas de arriba sigan desordenadas. No es un error:
+      emparejar la cruz es la <b>próxima</b> lección. Hoy alcanza con los cuatro amarillos mirando al cielo.
+    </div>
+  </div>
+
+  <h2>Probate: ¿leés la última capa?</h2>
+  <p>Cuatro escenarios. Feedback al toque.</p>
+
+  <div class="quiz" id="quiz">
+    <div class="qhead"><h4>Quiz de la cruz amarilla</h4><p>Tocá una opción para ver por qué.</p></div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>1.</b> Al mirar la cara de arriba para esta etapa, ¿en qué te fijás?</p>
+      <button class="opt" data-fb="Las esquinas se orientan en una etapa posterior. Ahora solo cuentan las aristas: mezclar ambas cosas confunde la lectura de la forma.">En que las 4 esquinas amarillas miren hacia arriba.</button>
+      <button class="opt" data-fb="Exacto. Solo importan las 4 aristas amarillas (los costados del centro). Ignorás las esquinas: se resuelven después.">Solo en las 4 aristas amarillas; ignorás las esquinas.</button>
+      <button class="opt" data-fb="Que los brazos coincidan con los centros es el paso siguiente (emparejar). En esta etapa solo orientás: que el amarillo mire arriba.">En que cada arista ya coincida con el centro de su lado.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="2">
+      <p class="scn"><b>2.</b> ¿Por qué el algoritmo <code class="mv">F R U R' U' F'</code> es fácil de recordar?</p>
+      <button class="opt" data-fb="No es la cruz blanca ni su método; ahí usabas la margarita y F2. Este es un algoritmo distinto para la cara de arriba.">Porque es el mismo que usaste para la cruz blanca.</button>
+      <button class="opt" data-fb="No son dos sexy moves seguidos. Es UNO solo, con una F adelante y una F' atrás que lo envuelven.">Porque es el sexy move hecho dos veces.</button>
+      <button class="opt" data-fb="Eso es. Es tu sexy move R U R' U' metido en un sándwich: F al principio y F' al final. Un gesto conocido, envuelto.">Porque es R U R' U' envuelto entre F y F'.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="0">
+      <p class="scn"><b>3.</b> Tenés una <b>línea</b> horizontal de aristas amarillas. ¿Cómo la sostenés antes de aplicar el algoritmo?</p>
+      <button class="opt" data-fb="Correcto. La línea va horizontal, de izquierda a derecha; una aplicación del algoritmo la convierte en cruz.">Horizontal, apuntando de izquierda a derecha.</button>
+      <button class="opt" data-fb="Vertical no es la orientación de la línea para este algoritmo: girala 90° para dejarla horizontal primero.">Vertical, apuntando de adelante hacia atrás.</button>
+      <button class="opt" data-fb="La orientación importa: aplicar en cualquier ángulo puede llevarte a otra forma en vez de a la cruz. Ponela horizontal.">Da igual la orientación, siempre sale la cruz.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>4.</b> Formaste la cruz amarilla, pero los brazos no coinciden con los centros de los lados y las esquinas siguen revueltas. ¿Qué significa?</p>
+      <button class="opt" data-fb="No hiciste nada mal. Emparejar los brazos con los centros y resolver las esquinas son etapas siguientes; no forman parte de este paso.">Me equivoqué; hay que rehacer la cruz desde cero.</button>
+      <button class="opt" data-fb="Exacto. Esta etapa solo orienta las aristas (amarillo arriba). Que los brazos no coincidan y las esquinas estén revueltas es lo esperado; se arregla después.">Está perfecto: emparejar y las esquinas vienen en las próximas lecciones.</button>
+      <button class="opt" data-fb="No hace falta seguir aplicándolo: una vez que la cruz está formada, repetir el algoritmo la puede deshacer. Pasás a la etapa siguiente.">Sigo aplicando F R U R' U' F' hasta que coincidan.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="qscore" id="qscore">0 / 4 — probá las cuatro</div>
+  </div>
+
+  <div class="ask">
+    <b>👋 Tu profe.</b> Con la cruz amarilla ya empezaste la <b>última capa</b> y sumaste una herramienta de lectura (punto/L/línea)
+    más un algoritmo que ya conocías disfrazado. La <b>Lección 6</b> toma esta cruz y la <b>empareja</b>: gira los brazos hasta que
+    cada arista quede sobre su centro, dejando la última capa lista para las esquinas. ¿Te salió leer las tres formas? ¿Desde el
+    punto te tomó una o dos pasadas? <b>Contame y seguimos.</b>
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">J Perm (Dylan Wang) — <cite>How To Solve The 3x3 Rubik's Cube</cite>, etapa "Yellow Cross".
+        <a href="https://www.jperm.net/3x3">jperm.net/3x3</a>. <cite>"Focus on the colors on edge pieces, and not corner
+        pieces"</cite>; algoritmo = girar el frente, hacer el sexy move de 4 y deshacer el frente. Emparejar con los centros es
+        el paso siguiente ("Match Cross Colors"), no este.</li>
+      <li id="r2">Ruwix — <cite>Beginner's Method</cite>, cruz amarilla (notación y formas).
+        <a href="https://ruwix.com/the-rubiks-cube/how-to-solve-the-rubiks-cube-beginners-method/">ruwix.com</a>.
+        Algoritmo <code>F R U R' U' F'</code>; tres formas de partida (punto, L, línea);
+        <cite>"it doesn't matter if the pieces are not on their final places"</cite> — solo cuenta el amarillo hacia arriba.</li>
+      <li id="r3">CubeSkills (Feliks Zemdegs) — <cite>The Beginner's Method</cite>.
+        <a href="https://www.cubeskills.com/tutorials/the-beginners-method-for-solving-the-rubiks-cube">cubeskills.com</a>.
+        Segunda voz del método y hojas de algoritmos limpias.</li>
+    </ol>
+    <p>Más fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Términos en <a href="../GLOSSARY.md">GLOSSARY.md</a> · Tu misión en <a href="../MISSION.md">MISSION.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <a href="0004-segunda-capa-aristas.html">← Lección 4 · Segunda capa: aristas</a>
+      <span style="color:#b9bdd0">Próxima · Emparejar la cruz amarilla (en construcción)</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const quiz = document.getElementById('quiz');
+  const qs = Array.from(quiz.querySelectorAll('.q'));
+  const scoreEl = document.getElementById('qscore');
+  const answered = new Array(qs.length).fill(false);
+
+  qs.forEach((q, qi) => {
+    const correct = parseInt(q.dataset.correct, 10);
+    const opts = Array.from(q.querySelectorAll('.opt'));
+    const fb = q.querySelector('.fb');
+    opts.forEach((opt, oi) => {
+      opt.addEventListener('click', () => {
+        const isRight = (oi === correct);
+        opt.classList.add(isRight ? 'right' : 'wrong');
+        fb.textContent = opt.dataset.fb;
+        fb.className = 'fb show ' + (isRight ? 'ok' : 'no');
+        if(!answered[qi]){
+          answered[qi] = isRight ? 'ok' : 'seen';
+          update();
+        }
+        if(isRight){
+          opts.forEach(o => o.disabled = true);
+        }
+      });
+    });
+  });
+
+  function update(){
+    const right = answered.filter(a => a === 'ok').length;
+    if(right === qs.length){
+      scoreEl.textContent = "✓ Las cuatro. Cruz amarilla dominada: orientar aristas, leer punto/L/línea, y el sexy move en sándwich.";
+      scoreEl.classList.add('full');
+    } else {
+      scoreEl.textContent = right + " / " + qs.length + " resueltas — seguí probando";
+      scoreEl.classList.remove('full');
+    }
+  }
+})();
+</script>
+</body>
+</html>

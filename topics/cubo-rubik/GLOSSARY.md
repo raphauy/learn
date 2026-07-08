@@ -71,6 +71,24 @@ Técnica de principiante para la cruz: se arman los 4 pétalos blancos alrededor
 (arriba) y se bajan de a uno con una vuelta doble (`F2`), emparejando con cada centro.
 _Avoid_: la flor
 
+## Última capa
+
+**Orientar (una pieza)**:
+Que la pieza mire hacia el lado correcto — para la última capa, que su **amarillo apunte hacia arriba** —
+sin importar en qué posición esté. Es "cómo está parada", no "dónde está".
+_Avoid_: dar vuelta, girar la pieza
+
+**Ubicar / permutar (una pieza)**:
+Llevar la pieza a su **posición** correcta (dónde va), sin importar cómo esté orientada. La última capa
+se resuelve separando ambas cosas: primero orientar, después ubicar.
+_Avoid_: acomodar, poner en su lugar (ambiguo)
+
+**Cruz amarilla**:
+Las 4 aristas de la última capa con su **amarillo hacia arriba**, formando una cruz con el centro amarillo.
+Solo cuenta la orientación: los brazos **todavía no** tienen por qué coincidir con los centros laterales
+(eso es un paso posterior). Se logra con `F R U R' U' F'` leyendo la forma (punto / L / línea).
+_Avoid_: cruz (a secas), cruz amarilla terminada
+
 ## Método (para más adelante)
 
 **Método principiante (capa por capa / LBL)**:

@@ -22,7 +22,7 @@ minuto) están en el `NOTES.md` global de la raíz.
 2. ✅ **0002 — La cruz blanca** (método margarita/daisy; cruz EMPAREJADA con centros; usa F2 y U).
 3. ✅ **0003 — Primera capa: esquinas** (trigger R U R' U' repetido; posicionar por brújula; "confiar en el algoritmo").
 4. ✅ **0004 — Segunda capa: aristas** (regla "sin amarillo"; T invertida; algoritmos espejo der `U R U' R' U' F' U F` / izq `U' L' U L U F U' F'`; caso arista atascada).
-5. **0005 — Cruz amarilla** (OLL de aristas del principiante).
+5. ✅ **0005 — Cruz amarilla** (orientar aristas ULT: `F R U R' U' F'` = sexy en sándwich; leer punto/L/línea; ignorar esquinas; aún NO empareja con centros).
 6. **0006 — Orientar la cruz / permutar aristas de arriba**.
 7. **0007 — Ubicar esquinas** (posición).
 8. **0008 — Orientar esquinas / resolver** (el clásico "R' D' R D").
