@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
+<title>Cubo 4 — La segunda capa: las aristas del medio (dos algoritmos espejo)</title>
+<style>
+  :root{
+    --ink:#1b2233; --soft:#5d6478; --line:#e4e6ef; --bg:#fbfaf9;
+    --accent:#e11d48; --accent-soft:#fff1f4; --accent-line:#fbcfda; --accent-ink:#9f1239;
+    --accent2:#ea580c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(24,28,55,.07),0 8px 24px rgba(24,28,55,.06);
+    --cW:#f7f7f5; --cY:#ffd500; --cR:#d21f1f; --cO:#ff6d00; --cB:#1769d6; --cG:#2fa84a; --cGray:#e9ebf1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-size:33px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:12px; font-size:15px; color:var(--accent-ink)}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:46px 0 12px; letter-spacing:-.2px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px}
+  cite{font-style:italic}
+  em.q{font-style:italic; color:var(--accent-ink)}
+  code.mv{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:700;
+    background:#1b2233; color:#fff; padding:2px 8px; border-radius:7px; font-size:.92em; letter-spacing:.5px; white-space:nowrap}
+
+  /* algoritmos espejo lado a lado */
+  .algos{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:20px 0}
+  .algo{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 18px 16px; box-shadow:var(--shadow); text-align:center}
+  .algo .side{font-size:12px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--accent)}
+  .algo .seq{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:19px; letter-spacing:1px;
+    background:#1b2233; color:#fff; padding:12px 10px; border-radius:12px; margin:10px 0 8px; display:block}
+  .algo .when{font-size:13px; color:var(--soft)}
+  .algo .when b{color:var(--ink)}
+
+  /* diagrama de la cara frontal (T invertida) */
+  .facewrap{display:flex; gap:22px; align-items:center; flex-wrap:wrap; justify-content:center;
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin:18px 0; box-shadow:var(--shadow)}
+  .face{display:grid; grid-template-columns:repeat(3,34px); grid-template-rows:repeat(3,34px); gap:4px}
+  .face .c{border-radius:6px; border:1px solid rgba(0,0,0,.08)}
+  .cw{background:var(--cW)} .cy{background:var(--cY)} .cr{background:var(--cR)}
+  .co{background:var(--cO)} .cb{background:var(--cB)} .cg{background:var(--cG)} .cx{background:var(--cGray)}
+  .face .c.mark{box-shadow:0 0 0 2px var(--accent)}
+  .facekey{font-size:14px; color:var(--soft); max-width:32ch}
+  .facekey b{color:var(--accent-ink)}
+
+  /* descomposición del algoritmo */
+  .cycle{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:18px 0}
+  .cyc{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 14px; box-shadow:var(--shadow); text-align:center}
+  .cyc .ico{font-size:22px; font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800}
+  .cyc h4{margin:8px 0 4px; font-size:15.5px}
+  .cyc p{margin:0; font-size:13px; color:var(--soft)}
+
+  .callout{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px}
+  .callout b{color:var(--accent2)}
+  .note{background:var(--accent-soft); border:1px solid var(--accent-line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15px; color:var(--accent-ink)}
+  .note b{color:var(--accent)}
+
+  /* práctica / pasos */
+  .practice{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:18px 0; box-shadow:var(--shadow)}
+  .practice .lbl{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .practice h3{margin:10px 0 4px; font-size:20px}
+  .step{display:flex; gap:14px; align-items:flex-start; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line)}
+  .step:first-of-type{border-top:none}
+  .step .n{flex:none; width:28px; height:28px; border-radius:8px; background:var(--accent-soft); color:var(--accent);
+    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px}
+  .step b{font-size:15px}
+  .step p{margin:3px 0 0; font-size:13.5px; color:var(--soft)}
+  .step ul{margin:6px 0 0; padding-left:18px; font-size:13.5px; color:var(--soft)}
+  .step li{margin-bottom:4px}
+  .step li b{color:var(--ink)}
+  .winline{margin-top:16px; padding:12px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; font-size:14.5px; color:#14532d}
+  .winline b{color:var(--good)}
+
+  /* quiz */
+  .quiz{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:8px 8px 6px; margin:22px 0; box-shadow:var(--shadow); overflow:hidden}
+  .qhead{padding:16px 18px 6px}
+  .qhead h4{margin:0 0 2px; font-size:17px}
+  .qhead p{margin:0; font-size:13px; color:var(--soft)}
+  .q{padding:16px 18px; border-top:1px solid var(--line)}
+  .q .scn{font-size:15.5px; margin:0 0 12px}
+  .q .scn b{color:var(--accent-ink)}
+  .opt{display:block; width:100%; text-align:left; font:inherit; font-size:14.5px; color:var(--ink);
+    background:#fbfbfd; border:1.5px solid var(--line); border-radius:10px; padding:11px 14px; margin:8px 0; cursor:pointer; transition:all .12s}
+  .opt:hover{border-color:var(--accent-line); background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--good); background:#f0fdf4}
+  .opt.wrong{border-color:var(--bad); background:#fef2f2}
+  .fb{font-size:13.5px; margin:8px 2px 0; padding:11px 14px; border-radius:10px; display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0}
+  .fb.no{background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca}
+  .fb b{font-weight:800}
+  .qscore{padding:14px 18px; font-size:14.5px; font-weight:700; color:var(--accent); text-align:center; border-top:1px solid var(--line)}
+  .qscore.full{color:#fff; background:var(--accent)}
+
+  .ask{margin:40px 0 0; padding:18px 22px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:14px; font-size:15.5px; color:var(--accent-ink)}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    h1{font-size:27px}
+    .cycle,.algos{grid-template-columns:1fr}
+  }
+  @media print{
+    body{background:#fff}
+    .algo,.cyc,.practice,.quiz,.facewrap{box-shadow:none}
+    .callout,.note{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Cubo de Rubik · Lección 4 · Segunda capa</p>
+  <h1>Las aristas del medio:<br>dos algoritmos espejo</h1>
+  <p class="sub">Con la primera capa cerrada, llenás la franja del medio con las 4 aristas que le faltan. Un solo algoritmo y su espejo — y pasás a tener <b>dos tercios del cubo</b> resueltos.</p>
+
+  <div class="mission">
+    <span>🎯</span>
+    <div><b>Por qué esta es TU lección.</b> Es el primer algoritmo "largo" (8 movimientos) del método — pero no es nuevo:
+    es <b>preparación + dos gestos de 3</b>, el mismo ADN del <code class="mv">sexy move</code> que ya dominás. Al terminar,
+    las <b>dos capas de abajo</b> quedan completas y solo te queda la cara de arriba. Cada vez más cerca de resolverlo <b>de memoria</b>.</div>
+  </div>
+
+  <p class="lede">La regla que lo hace fácil: las aristas del medio son <b>exactamente las 4 que NO tienen amarillo</b>.
+  El amarillo pertenece a la capa de arriba; si una arista lo lleva, no es de esta capa — ignorala.<sup><a href="#r1">1</a></sup></p>
+
+  <div class="note">
+    <b>No des vuelta el cubo:</b> seguís con <b>blanco abajo, amarillo arriba</b>, igual que en las Lecciones 2 y 3.
+    Trabajás desde la <b>capa de arriba</b>: buscás ahí las aristas sin amarillo y las dejás caer, una por una, en su ranura del medio.
+  </div>
+
+  <h2>Paso 1 — Leé la arista: ¿a qué lado va?</h2>
+  <p>Elegís una arista de arriba sin amarillo. Girás <code class="mv">U</code> hasta que su color <b>de costado</b> coincida con
+  el centro de esa cara: se forma una <b>"T invertida"</b> (dos del mismo color en fila, apuntando al centro).<sup><a href="#r1">1</a></sup>
+  Entonces mirás su <b>otro</b> color —el que apunta hacia arriba— y ese te dice el lado: si "cae" hacia la derecha, va a la derecha; hacia la izquierda, a la izquierda.</p>
+
+  <div class="facewrap">
+    <div class="face" aria-label="Cara frontal con una T invertida roja">
+      <div class="c cx"></div><div class="c cr mark"></div><div class="c cx"></div>
+      <div class="c cx"></div><div class="c cr"></div><div class="c cx"></div>
+      <div class="c cw"></div><div class="c cw"></div><div class="c cw"></div>
+    </div>
+    <div class="facekey"><b>La "T invertida".</b> El color de costado de la arista (rojo, arriba resaltado)
+    quedó alineado con su centro rojo → esta cara es la correcta para empezar. Ahora fijate el segundo color de esa arista,
+    el que mira al cielo: hacia qué lado apunta, ahí va. Abajo, la fila blanca es tu primera capa: intacta.</div>
+  </div>
+
+  <h2>Paso 2 — El algoritmo del lado que toca</h2>
+  <p>Sostené el cubo con esa cara al frente y aplicá el algoritmo correspondiente. Son <b>espejo perfecto</b> uno del otro:
+  cambiá cada <code class="mv">R</code> por <code class="mv">L</code>, mantené la <code class="mv">F</code> como "frente", e invertí los <code class="mv">'</code>.</p>
+
+  <div class="algos">
+    <div class="algo">
+      <span class="side">▶ Va a la derecha</span>
+      <code class="seq">U R U' R' U' F' U F</code>
+      <span class="when">El color de arriba de la arista apunta al centro de la <b>derecha</b>.</span>
+    </div>
+    <div class="algo">
+      <span class="side">Va a la izquierda ◀</span>
+      <code class="seq">U' L' U L U F U' F'</code>
+      <span class="when">El color de arriba de la arista apunta al centro de la <b>izquierda</b>.</span>
+    </div>
+  </div>
+
+  <p>Por qué no es un algoritmo "nuevo que memorizar" (leé el de la derecha en tres tiempos):<sup><a href="#r2">2</a></sup></p>
+  <div class="cycle">
+    <div class="cyc"><div class="ico">U</div><h4>Preparás</h4><p>Un giro de arriba lleva la arista sobre la ranura de destino y despeja el camino.</p></div>
+    <div class="cyc"><div class="ico">R U' R'</div><h4>Abrí · girá · cerrá</h4><p>Un gesto de 3 abre la ranura derecha, mete la arista y cierra. Puro trigger.</p></div>
+    <div class="cyc"><div class="ico">U' F' U F</div><h4>Reparás</h4><p>El gesto espejo devuelve a su lugar la esquina de la 1ª capa que tuvo que moverse.</p></div>
+  </div>
+
+  <div class="callout">
+    <b>Confiá en el algoritmo — otra vez.</b> A mitad de la secuencia vas a ver esquinas de la primera capa "salir" y la cara
+    romperse. No corrijas a mano: el algoritmo <b>devuelve todo a su lugar</b> al completarse.<sup><a href="#r2">2</a></sup>
+    Es el mismo acto de fe que ya practicaste con las esquinas: dejá terminar la secuencia entera.
+  </div>
+
+  <h2>El caso que traba a todos: la arista ya está en el medio, pero mal</h2>
+  <p>¿Necesitás una arista que ya está en la franja del medio, pero al revés o en la ranura equivocada, y arriba no ves ninguna
+  sin amarillo para trabajar? No la saques con los dedos. <b>Meté cualquier arista de arriba en esa ranura</b> con uno de los
+  dos algoritmos: eso <b>expulsa</b> la arista mala a la capa de arriba, y desde ahí la resolvés como una más.<sup><a href="#r1">1</a></sup></p>
+
+  <div class="practice">
+    <span class="lbl">Hacelo con el cubo en la mano</span>
+    <h3>Insertar las 4 aristas del medio</h3>
+
+    <div class="step">
+      <div class="n">1</div>
+      <div><b>Mirá la capa de arriba y buscá una arista SIN amarillo.</b> Tiene 2 colores, ninguno amarillo (ej. rojo y verde).
+      Esa es candidata a bajar al medio.</div>
+    </div>
+    <div class="step">
+      <div class="n">2</div>
+      <div><b>Girá solo <code class="mv">U</code> hasta formar la "T invertida":</b> el color de costado de la arista alineado con
+      su centro. Ahora esa cara es tu frente.</div>
+    </div>
+    <div class="step">
+      <div class="n">3</div>
+      <div><b>Decidí el lado por el color de arriba</b> de la arista y aplicá el algoritmo:
+      <ul>
+        <li>Apunta a la <b>derecha</b> → <code class="mv">U R U' R' U' F' U F</code></li>
+        <li>Apunta a la <b>izquierda</b> → <code class="mv">U' L' U L U F U' F'</code></li>
+      </ul>
+      Hacelo entero, sin cortar a la mitad.</div>
+    </div>
+    <div class="step">
+      <div class="n">4</div>
+      <div><b>¿No queda ninguna arista útil arriba pero el medio no está completo?</b> Es que una arista buena está atascada abajo,
+      mal puesta. Meté cualquier arista de arriba en esa ranura con un algoritmo: la mala salta arriba. Volvé al paso 1 con ella.</div>
+    </div>
+
+    <div class="winline">
+      <b>Tu win de hoy:</b> las 4 aristas en su lugar → <b>dos capas completas</b>. Señal de que está bien: mirando cada una de las
+      4 caras laterales, los <b>dos tercios de abajo</b> son un bloque de color sólido (centro incluido). La cara blanca sigue entera
+      abajo. Solo la cara de arriba (amarilla) queda mezclada — y eso es exactamente lo que atacamos después.
+    </div>
+  </div>
+
+  <h2>Probate: ¿leés bien la segunda capa?</h2>
+  <p>Cuatro escenarios. Feedback al toque.</p>
+
+  <div class="quiz" id="quiz">
+    <div class="qhead"><h4>Quiz de la segunda capa</h4><p>Tocá una opción para ver por qué.</p></div>
+
+    <div class="q" data-correct="2">
+      <p class="scn"><b>1.</b> En la capa de arriba ves cuatro aristas: verde-amarilla, azul-amarilla, roja-verde y naranja-amarilla. ¿Cuál bajás al medio?</p>
+      <button class="opt" data-fb="La verde-amarilla lleva amarillo: el amarillo es de la capa de arriba, así que esta arista NO es de la segunda capa.">La verde-amarilla.</button>
+      <button class="opt" data-fb="Cualquiera no: tres de esas cuatro llevan amarillo. El amarillo pertenece a la cara de arriba, no al medio.">Cualquiera, da igual el color.</button>
+      <button class="opt" data-fb="Exacto. Es la única sin amarillo. Las aristas del medio son justo las que no tienen amarillo; las otras tres se quedan arriba para más adelante.">La roja-verde.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>2.</b> Alineaste la "T invertida": el rojo de la arista coincide con el centro rojo del frente. Su segundo color, el naranja, mira hacia arriba y "cae" hacia el centro naranja de la <b>izquierda</b>. ¿Qué hacés?</p>
+      <button class="opt" data-fb="Ese es el algoritmo de la derecha. Como el color de arriba apunta a la izquierda, usás el espejo izquierdo.">U R U' R' U' F' U F (derecha).</button>
+      <button class="opt" data-fb="Correcto. El color de arriba apunta a la izquierda → algoritmo izquierdo. Es el espejo: L en vez de R, y los primes invertidos.">U' L' U L U F U' F' (izquierda).</button>
+      <button class="opt" data-fb="Girar solo la capa de arriba no inserta nada: solo pasea la arista. Para bajarla al medio hace falta el algoritmo completo del lado que corresponde.">Sigo girando U hasta que entre sola.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="0">
+      <p class="scn"><b>3.</b> A mitad del algoritmo ves que una esquina de tu primera capa "se salió" y la cara se desarmó. ¿Qué hacés?</p>
+      <button class="opt" data-fb="Sí. El algoritmo saca y devuelve: si lo completás, la esquina vuelve a su lugar. Cortar o acomodar a mano es lo que traba el cubo.">Completo la secuencia; el algoritmo la devuelve a su lugar.</button>
+      <button class="opt" data-fb="Justo lo que NO hay que hacer: acomodar a mano en el medio rompe la lógica y sí desarma el cubo de verdad.">Freno y acomodo la esquina con los dedos.</button>
+      <button class="opt" data-fb="No hace falta reiniciar: no está roto, está a mitad de camino. Dejá que la secuencia termine y mirá el resultado.">Deshago todo y arranco de cero.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="2">
+      <p class="scn"><b>4.</b> Te falta una arista en el medio, pero la que necesitás ya está ahí — al revés — y arriba no hay ninguna sin amarillo para trabajar. ¿Cómo la destrabás?</p>
+      <button class="opt" data-fb="A mano no: forzar la pieza con los dedos desarma el cubo. Se saca con un algoritmo, no tirando.">La saco con los dedos y la doy vuelta.</button>
+      <button class="opt" data-fb="Girar la capa de abajo movería la primera capa que ya resolviste. La arista mala se expulsa desde arriba, no desde abajo.">Giro la capa de abajo hasta que se dé vuelta.</button>
+      <button class="opt" data-fb="Eso es. Metés cualquier arista de arriba en esa ranura con un algoritmo; la mala salta a la capa de arriba y desde ahí la resolvés bien.">Meto cualquier arista de arriba en esa ranura para expulsarla.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="qscore" id="qscore">0 / 4 — probá las cuatro</div>
+  </div>
+
+  <div class="ask">
+    <b>👋 Tu profe.</b> Si cerraste la segunda capa, ya tenés <b>dos tercios del cubo de memoria</b>: cruz + esquinas + aristas del
+    medio, todo con el mismo hábito de <b>leer la pieza y confiar en el algoritmo</b>. Lo que queda es <b>toda la última capa</b>
+    (la amarilla), y arranca en la <b>Lección 5</b> con la <b>cruz amarilla</b>. ¿Te costó decidir el lado (izquierda/derecha)?
+    ¿El caso de la arista atascada te apareció? <b>Contame cómo te fue y seguimos.</b>
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">J Perm (Dylan Wang) — <cite>How To Solve The 3x3 Rubik's Cube</cite>, etapa "Second Layer".
+        <a href="https://www.jperm.net/3x3">jperm.net/3x3</a>. <cite>"Find an edge piece in the top layer without yellow as
+        either of its 2 colors"</cite>; alinear el color con un centro y elegir derecha/izquierda; si la arista está atascada en
+        la 2ª capa, <cite>"move any edge into its spot… this will cause the edge to come out into the top layer"</cite>.</li>
+      <li id="r2">Ruwix — <cite>Beginner's Method</cite>, aristas de la segunda capa (notación exacta).
+        <a href="https://ruwix.com/the-rubiks-cube/how-to-solve-the-rubiks-cube-beginners-method/">ruwix.com</a>.
+        Derecha: <code>U R U' R' U' F' U F</code> · Izquierda: <code>U' L' U L U F U' F'</code>.</li>
+      <li id="r3">CubeSkills (Feliks Zemdegs) — <cite>The Beginner's Method</cite>.
+        <a href="https://www.cubeskills.com/tutorials/the-beginners-method-for-solving-the-rubiks-cube">cubeskills.com</a>.
+        Segunda voz del método y hojas de algoritmos limpias.</li>
+    </ol>
+    <p>Más fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Términos en <a href="../GLOSSARY.md">GLOSSARY.md</a> · Tu misión en <a href="../MISSION.md">MISSION.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <a href="0003-esquinas-primera-capa.html">← Lección 3 · Esquinas de la 1ª capa</a>
+      <span style="color:#b9bdd0">Próxima · Cruz amarilla (en construcción)</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const quiz = document.getElementById('quiz');
+  const qs = Array.from(quiz.querySelectorAll('.q'));
+  const scoreEl = document.getElementById('qscore');
+  const answered = new Array(qs.length).fill(false);
+
+  qs.forEach((q, qi) => {
+    const correct = parseInt(q.dataset.correct, 10);
+    const opts = Array.from(q.querySelectorAll('.opt'));
+    const fb = q.querySelector('.fb');
+    opts.forEach((opt, oi) => {
+      opt.addEventListener('click', () => {
+        const isRight = (oi === correct);
+        opt.classList.add(isRight ? 'right' : 'wrong');
+        fb.textContent = opt.dataset.fb;
+        fb.className = 'fb show ' + (isRight ? 'ok' : 'no');
+        if(!answered[qi]){
+          answered[qi] = isRight ? 'ok' : 'seen';
+          update();
+        }
+        if(isRight){
+          opts.forEach(o => o.disabled = true);
+        }
+      });
+    });
+  });
+
+  function update(){
+    const right = answered.filter(a => a === 'ok').length;
+    if(right === qs.length){
+      scoreEl.textContent = "✓ Las cuatro. Segunda capa dominada: leer sin-amarillo, decidir el lado, y confiar en el algoritmo.";
+      scoreEl.classList.add('full');
+    } else {
+      scoreEl.textContent = right + " / " + qs.length + " resueltas — seguí probando";
+      scoreEl.classList.remove('full');
+    }
+  }
+})();
+</script>
+</body>
+</html>
