@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
+<title>Cubo 7 — Ubicar las esquinas: cada una a su vértice</title>
+<style>
+  :root{
+    --ink:#1b2233; --soft:#5d6478; --line:#e4e6ef; --bg:#fbfaf9;
+    --accent:#e11d48; --accent-soft:#fff1f4; --accent-line:#fbcfda; --accent-ink:#9f1239;
+    --accent2:#ea580c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(24,28,55,.07),0 8px 24px rgba(24,28,55,.06);
+    --cW:#f7f7f5; --cY:#ffd500; --cR:#d21f1f; --cO:#ff6d00; --cB:#1769d6; --cG:#2fa84a; --cGray:#e9ebf1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-size:33px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:12px; font-size:15px; color:var(--accent-ink)}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:46px 0 12px; letter-spacing:-.2px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px}
+  cite{font-style:italic}
+  em.q{font-style:italic; color:var(--accent-ink)}
+  code.mv{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:700;
+    background:#1b2233; color:#fff; padding:2px 8px; border-radius:7px; font-size:.92em; letter-spacing:.5px; white-space:nowrap}
+
+  /* algoritmo destacado */
+  .trigger{display:flex; gap:14px; align-items:center; flex-wrap:wrap; justify-content:center;
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin:20px 0; box-shadow:var(--shadow)}
+  .trigger .seq{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:23px; letter-spacing:1.5px;
+    background:#1b2233; color:#fff; padding:12px 18px; border-radius:12px}
+  .trigger .lab{font-size:14px; color:var(--soft); max-width:34ch}
+  .trigger .lab b{color:var(--accent)}
+
+  /* diagrama del ciclo de esquinas */
+  .facewrap{display:flex; gap:22px; align-items:center; flex-wrap:wrap; justify-content:center;
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin:18px 0; box-shadow:var(--shadow)}
+  .face{display:grid; grid-template-columns:repeat(3,38px); grid-template-rows:repeat(3,38px); gap:4px}
+  .face .c{border-radius:6px; border:1px solid rgba(0,0,0,.08); display:flex; align-items:center; justify-content:center; font-size:16px}
+  .cy{background:var(--cY)} .cy0{background:#fff6c4} .cnr{background:var(--cGray)} .fix{background:var(--cG); color:#fff}
+  .facekey{font-size:14px; color:var(--soft); max-width:30ch}
+  .facekey b{color:var(--accent-ink)}
+  .facefront{font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--soft); text-align:center; margin-top:8px}
+
+  /* efecto en 3 tiempos */
+  .cycle{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:18px 0}
+  .cyc{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 14px; box-shadow:var(--shadow); text-align:center}
+  .cyc .ico{font-size:24px}
+  .cyc h4{margin:8px 0 4px; font-size:15.5px}
+  .cyc p{margin:0; font-size:13px; color:var(--soft)}
+
+  .callout{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px}
+  .callout b{color:var(--accent2)}
+  .note{background:var(--accent-soft); border:1px solid var(--accent-line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15px; color:var(--accent-ink)}
+  .note b{color:var(--accent)}
+
+  /* práctica / pasos */
+  .practice{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:18px 0; box-shadow:var(--shadow)}
+  .practice .lbl{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .practice h3{margin:10px 0 4px; font-size:20px}
+  .step{display:flex; gap:14px; align-items:flex-start; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line)}
+  .step:first-of-type{border-top:none}
+  .step .n{flex:none; width:28px; height:28px; border-radius:8px; background:var(--accent-soft); color:var(--accent);
+    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px}
+  .step b{font-size:15px}
+  .step p{margin:3px 0 0; font-size:13.5px; color:var(--soft)}
+  .step ul{margin:6px 0 0; padding-left:18px; font-size:13.5px; color:var(--soft)}
+  .step li{margin-bottom:4px}
+  .step li b{color:var(--ink)}
+  .winline{margin-top:16px; padding:12px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; font-size:14.5px; color:#14532d}
+  .winline b{color:var(--good)}
+
+  /* quiz */
+  .quiz{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:8px 8px 6px; margin:22px 0; box-shadow:var(--shadow); overflow:hidden}
+  .qhead{padding:16px 18px 6px}
+  .qhead h4{margin:0 0 2px; font-size:17px}
+  .qhead p{margin:0; font-size:13px; color:var(--soft)}
+  .q{padding:16px 18px; border-top:1px solid var(--line)}
+  .q .scn{font-size:15.5px; margin:0 0 12px}
+  .q .scn b{color:var(--accent-ink)}
+  .opt{display:block; width:100%; text-align:left; font:inherit; font-size:14.5px; color:var(--ink);
+    background:#fbfbfd; border:1.5px solid var(--line); border-radius:10px; padding:11px 14px; margin:8px 0; cursor:pointer; transition:all .12s}
+  .opt:hover{border-color:var(--accent-line); background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--good); background:#f0fdf4}
+  .opt.wrong{border-color:var(--bad); background:#fef2f2}
+  .fb{font-size:13.5px; margin:8px 2px 0; padding:11px 14px; border-radius:10px; display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0}
+  .fb.no{background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca}
+  .fb b{font-weight:800}
+  .qscore{padding:14px 18px; font-size:14.5px; font-weight:700; color:var(--accent); text-align:center; border-top:1px solid var(--line)}
+  .qscore.full{color:#fff; background:var(--accent)}
+
+  .ask{margin:40px 0 0; padding:18px 22px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:14px; font-size:15.5px; color:var(--accent-ink)}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    h1{font-size:27px}
+    .cycle{grid-template-columns:1fr}
+  }
+  @media print{
+    body{background:#fff}
+    .trigger,.cyc,.practice,.quiz,.facewrap{box-shadow:none}
+    .callout,.note{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Cubo de Rubik · Lección 7 · Última capa</p>
+  <h1>Ubicar las esquinas:<br>cada una a su vértice</h1>
+  <p class="sub">El penúltimo paso. Llevás las 4 esquinas a su lugar correcto —aunque queden mal giradas— con un solo algoritmo que cicla tres y deja una quieta.</p>
+
+  <div class="mission">
+    <span>🎯</span>
+    <div><b>Por qué esta es TU lección.</b> Otra vez el par <b>ubicar → orientar</b>, ahora con las esquinas: hoy solo las
+    <b>ubicás</b> (mañana las orientás y el cubo queda armado). Es la anteúltima pieza del método completo <b>de memoria</b>.
+    Después de esto, estás a <b>un algoritmo</b> de resolverlo entero.</div>
+  </div>
+
+  <p class="lede">Concepto clave: una esquina está <b>en su lugar</b> cuando sus <b>3 colores pertenecen a ese vértice</b> —coinciden con
+  las 3 caras que la rodean— <b>sin importar cómo esté girada</b>.<sup><a href="#r1">1</a></sup> Ubicar es "¿está en el vértice correcto?", no "¿mira bien?".</p>
+
+  <div class="note">
+    <b>Ubicar ≠ orientar (de nuevo).</b> Una esquina amarillo-rojo-azul está en su casa si vive en el vértice donde se tocan
+    las caras amarilla, roja y azul — aunque el amarillo no mire hacia arriba todavía. <b>Hoy no nos importa el giro</b>, solo el lugar.
+  </div>
+
+  <h2>Paso 1 — Buscá una esquina que ya esté en su lugar</h2>
+  <p>Mirá las 4 esquinas de arriba. ¿Hay alguna cuyos 3 colores sean los de su vértice (aunque esté torcida)? Puede haber
+  <b>una</b>, o <b>ninguna</b>.<sup><a href="#r1">1</a></sup> Rara vez ya están las 4 (entonces salteás este paso).</p>
+
+  <h2>Paso 2 — El algoritmo que cicla las otras tres</h2>
+  <p>Sostené la esquina correcta en el <b>frente-derecha</b> (arriba). Queda <b>quieta</b>; el algoritmo rota las otras tres a su
+  lugar.<sup><a href="#r2">2</a></sup> Si <b>ninguna</b> está bien, sostené cualquiera en el frente-derecha y aplicá una vez: va a
+  aparecer una esquina bien ubicada, y entonces sí la usás como ancla.<sup><a href="#r1">1</a></sup></p>
+
+  <div class="trigger">
+    <span class="seq">U R U' L' U R' U' L</span>
+    <span class="lab">Esquina correcta <b>quieta</b> en el frente-derecha. <code class="mv">R</code> y <code class="mv">L</code>
+    se turnan alrededor de <code class="mv">U</code> para <b>ciclar</b> las tres equivocadas.</span>
+  </div>
+
+  <div class="facewrap">
+    <div>
+      <div class="face" aria-label="Cara de arriba: una esquina fija y tres que ciclan">
+        <div class="c cnr">↻</div><div class="c cy0"></div><div class="c cnr">↻</div>
+        <div class="c cy0"></div><div class="c cy"></div><div class="c cy0"></div>
+        <div class="c cnr">↻</div><div class="c cy0"></div><div class="c fix">🔒</div>
+      </div>
+      <div class="facefront">▲ frente ▲</div>
+    </div>
+    <div class="facekey"><b>Ancla y ciclo.</b> La esquina 🔒 (frente-derecha) está bien ubicada y no se mueve.
+    Las tres ↻ rotan entre sí hasta caer en su vértice. Las aristas (amarillo tenue) ya están resueltas: no las tocás.</div>
+  </div>
+
+  <div class="cycle">
+    <div class="cyc"><div class="ico">🔒</div><h4>Una queda fija</h4><p>La esquina buena en frente-derecha es el ancla; no se mueve.</p></div>
+    <div class="cyc"><div class="ico">↻</div><h4>Tres ciclan</h4><p>Las otras tres rotan de posición entre ellas.</p></div>
+    <div class="cyc"><div class="ico">🔁</div><h4>Repetí si hace falta</h4><p>¿No cerró? Reevaluá cuál quedó bien, ponela de ancla y repetí.</p></div>
+  </div>
+
+  <div class="callout">
+    <b>No te asustes: se va a ver MÁS desordenado.</b> Al ubicar las esquinas, sus colores quedan apuntando para cualquier lado
+    y el cubo parece un caos arriba. <b>Es normal y esperado:</b> las esquinas están en su vértice correcto, solo <b>mal giradas</b>.
+    Eso —la orientación— es la <b>última</b> lección, y con un solo gesto repetido el cubo se resuelve entero.
+  </div>
+
+  <div class="practice">
+    <span class="lbl">Hacelo con el cubo en la mano</span>
+    <h3>Llevar las 4 esquinas a su vértice</h3>
+
+    <div class="step">
+      <div class="n">1</div>
+      <div><b>Revisá las 4 esquinas de arriba.</b> Buscá una cuyos 3 colores sean los de su vértice (mirá las 3 caras que la rodean),
+      sin importar el giro.</div>
+    </div>
+    <div class="step">
+      <div class="n">2</div>
+      <div><b>¿Hay una correcta?</b> Sostenela en el <b>frente-derecha</b> y aplicá <code class="mv">U R U' L' U R' U' L</code>.</div>
+    </div>
+    <div class="step">
+      <div class="n">3</div>
+      <div><b>¿Ninguna correcta?</b> Poné cualquier esquina en el frente-derecha y aplicá el algoritmo una vez. Ahora sí va a haber
+      una bien ubicada: volvé al paso 2 con ella como ancla.</div>
+    </div>
+    <div class="step">
+      <div class="n">4</div>
+      <div><b>Repetí hasta que las 4 estén en su vértice.</b> Suele tomar 1 o 2 aplicaciones. No mires el giro todavía: solo que cada
+      esquina tenga sus 3 colores en las 3 caras correctas.</div>
+    </div>
+
+    <div class="winline">
+      <b>Tu win de hoy:</b> las <b>4 esquinas en su lugar</b>. Chequeo: cada esquina tiene sus 3 colores tocando las 3 caras a las
+      que pertenece (aunque estén torcidas). Las dos primeras capas y la cruz amarilla siguen intactas. Estás a <b>una sola lección</b>
+      —un gesto repetido— del cubo <b>completamente resuelto</b>.
+    </div>
+  </div>
+
+  <h2>Probate: ¿ubicás bien las esquinas?</h2>
+  <p>Cuatro escenarios. Feedback al toque.</p>
+
+  <div class="quiz" id="quiz">
+    <div class="qhead"><h4>Quiz de ubicar esquinas</h4><p>Tocá una opción para ver por qué.</p></div>
+
+    <div class="q" data-correct="2">
+      <p class="scn"><b>1.</b> ¿Cuándo una esquina está "en su lugar" en esta etapa?</p>
+      <button class="opt" data-fb="Que el amarillo mire hacia arriba es orientación, y eso es la próxima etapa. Acá solo mirás la posición, no el giro.">Cuando su amarillo mira hacia arriba.</button>
+      <button class="opt" data-fb="No hace falta que ya esté bien girada. Una esquina puede estar en su vértice correcto y aun así torcida; eso cuenta como 'ubicada'.">Cuando sus 3 colores ya miran a la cara correcta.</button>
+      <button class="opt" data-fb="Exacto. Está ubicada si sus 3 colores pertenecen a ese vértice (coinciden con las 3 caras que lo rodean), sin importar cómo esté girada.">Cuando sus 3 colores son los de ese vértice, sin importar el giro.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="0">
+      <p class="scn"><b>2.</b> Encontraste <b>una</b> esquina bien ubicada. ¿Dónde la sostenés antes de aplicar el algoritmo?</p>
+      <button class="opt" data-fb="Correcto. La esquina correcta va al frente-derecha como ancla: queda quieta mientras el algoritmo cicla las otras tres.">En el frente-derecha; queda fija y las otras tres ciclan.</button>
+      <button class="opt" data-fb="No hace falta moverla abajo ni sacarla: se queda arriba, en el frente-derecha, como ancla del ciclo.">La bajo a la primera capa para no moverla.</button>
+      <button class="opt" data-fb="La posición importa: si el ancla no está en el frente-derecha, el ciclo no acomoda las otras tres como esperás.">Da igual dónde, el algoritmo la resuelve.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>3.</b> Mirás las 4 esquinas y <b>ninguna</b> está en su lugar. ¿Qué hacés?</p>
+      <button class="opt" data-fb="No está sin arreglo: desde 'ninguna correcta' se sale aplicando el algoritmo una vez, que hace aparecer al menos una bien ubicada.">Es imposible; hay que desarmar y rehacer capas.</button>
+      <button class="opt" data-fb="Eso es. Poné cualquier esquina en el frente-derecha, aplicá una vez, y va a aparecer una correcta para usar de ancla.">Pongo cualquiera en frente-derecha, aplico una vez, y reevalúo.</button>
+      <button class="opt" data-fb="Girar U solo reacomoda toda la capa pero no cambia qué esquinas están en su vértice: necesitás una pasada del algoritmo.">Giro U hasta que alguna caiga en su lugar sola.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>4.</b> Terminaste de ubicar y el cubo se ve <b>más desordenado</b> arriba: colores por todos lados. ¿Qué significa?</p>
+      <button class="opt" data-fb="No te equivocaste. Al ubicar las esquinas quedan en su vértice pero torcidas; por eso se ve caótico. Es exactamente el estado previo al paso final.">Me equivoqué en algún paso; hay que rehacer.</button>
+      <button class="opt" data-fb="Exacto. Las esquinas están en su lugar pero mal giradas: se ve caótico pero estás a un algoritmo (la orientación) de resolverlo todo.">Está bien: en su lugar pero torcidas; falta solo orientarlas.</button>
+      <button class="opt" data-fb="Repetir este algoritmo no arregla el giro: solo cambia posiciones. La orientación de las esquinas es la lección siguiente.">Sigo aplicando este algoritmo hasta que se ordene el color.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="qscore" id="qscore">0 / 4 — probá las cuatro</div>
+  </div>
+
+  <div class="ask">
+    <b>👋 Tu profe.</b> Con las esquinas ubicadas, tenés <b>todo el cubo en su lugar</b> salvo el giro de las esquinas de arriba.
+    La <b>Lección 8</b> es el final: un solo gesto repetido (<code class="mv">R' D' R D</code>) que orienta cada esquina y
+    <b>resuelve el cubo entero</b>. ¿Te apareció con 1 esquina correcta, o tuviste que aplicar una vez para destrabar? ¿El "caos"
+    del final te sorprendió? <b>Contame y cerramos el método.</b>
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">J Perm (Dylan Wang) — <cite>How To Solve The 3x3 Rubik's Cube</cite>, etapa "Position Last Layer Corners".
+        <a href="https://www.jperm.net/3x3">jperm.net/3x3</a>. <cite>"A corner is in the correct position if all 3 colors on the
+        piece match the surrounding colors"</cite> · <cite>"If 1 corner is correct, hold it in the front/right (if 0 are correct,
+        hold any corner in the front/right)"</cite>. Las esquinas quedan ubicadas pero pueden seguir torcidas (paso siguiente).</li>
+      <li id="r2">Ruwix — <cite>Beginner's Method</cite>, posicionar las esquinas de la última capa (notación exacta).
+        <a href="https://ruwix.com/the-rubiks-cube/how-to-solve-the-rubiks-cube-beginners-method/">ruwix.com</a>.
+        Algoritmo <code>U R U' L' U R' U' L</code>; llevar la esquina buena al frente-derecha-arriba y
+        <cite>"cycle the three wrong pieces"</cite>; si ninguna está bien, aplicarlo una vez para conseguir una buena.</li>
+      <li id="r3">CubeSkills (Feliks Zemdegs) — <cite>The Beginner's Method</cite>.
+        <a href="https://www.cubeskills.com/tutorials/the-beginners-method-for-solving-the-rubiks-cube">cubeskills.com</a>.
+        Segunda voz del método y hojas de algoritmos limpias.</li>
+    </ol>
+    <p>Más fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Términos en <a href="../GLOSSARY.md">GLOSSARY.md</a> · Tu misión en <a href="../MISSION.md">MISSION.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <a href="0006-emparejar-cruz-amarilla.html">← Lección 6 · Emparejar la cruz amarilla</a>
+      <span style="color:#b9bdd0">Próxima · Orientar esquinas y resolver (en construcción)</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const quiz = document.getElementById('quiz');
+  const qs = Array.from(quiz.querySelectorAll('.q'));
+  const scoreEl = document.getElementById('qscore');
+  const answered = new Array(qs.length).fill(false);
+
+  qs.forEach((q, qi) => {
+    const correct = parseInt(q.dataset.correct, 10);
+    const opts = Array.from(q.querySelectorAll('.opt'));
+    const fb = q.querySelector('.fb');
+    opts.forEach((opt, oi) => {
+      opt.addEventListener('click', () => {
+        const isRight = (oi === correct);
+        opt.classList.add(isRight ? 'right' : 'wrong');
+        fb.textContent = opt.dataset.fb;
+        fb.className = 'fb show ' + (isRight ? 'ok' : 'no');
+        if(!answered[qi]){
+          answered[qi] = isRight ? 'ok' : 'seen';
+          update();
+        }
+        if(isRight){
+          opts.forEach(o => o.disabled = true);
+        }
+      });
+    });
+  });
+
+  function update(){
+    const right = answered.filter(a => a === 'ok').length;
+    if(right === qs.length){
+      scoreEl.textContent = "✓ Las cuatro. Esquinas ubicadas: ancla en frente-derecha, ciclar las tres, y no mirar el giro todavía.";
+      scoreEl.classList.add('full');
+    } else {
+      scoreEl.textContent = right + " / " + qs.length + " resueltas — seguí probando";
+      scoreEl.classList.remove('full');
+    }
+  }
+})();
+</script>
+</body>
+</html>

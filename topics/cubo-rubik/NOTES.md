@@ -24,7 +24,7 @@ minuto) están en el `NOTES.md` global de la raíz.
 4. ✅ **0004 — Segunda capa: aristas** (regla "sin amarillo"; T invertida; algoritmos espejo der `U R U' R' U' F' U F` / izq `U' L' U L U F U' F'`; caso arista atascada).
 5. ✅ **0005 — Cruz amarilla** (orientar aristas ULT: `F R U R' U' F'` = sexy en sándwich; leer punto/L/línea; ignorar esquinas; aún NO empareja con centros).
 6. ✅ **0006 — Emparejar la cruz amarilla** (permutar aristas ULT: girar U p/ 2 coincidan; `R U R' U R U2 R' U` = Sune, con emparejadas atrás+derecha; casos adyacentes/opuestas/ninguna).
-7. **0007 — Ubicar esquinas** (posición).
+7. ✅ **0007 — Ubicar esquinas** (permutar esquinas ULT: reconocer esquina en su vértice s/importar giro; ancla en frente-derecha + `U R U' L' U R' U' L` cicla las otras 3; caso 0 correctas; queda "caótico" pero ubicado).
 8. **0008 — Orientar esquinas / resolver** (el clásico "R' D' R D").
 9. **Hito:** resolver entero de memoria, cronometrar sin presión → hoja de referencia del método.
 10. **Puente a CFOP:** finger tricks, F2L intuitivo, luego OLL/PLL de a poco (fuente: J Perm CFOP).
