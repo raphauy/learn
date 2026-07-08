@@ -23,7 +23,7 @@ minuto) están en el `NOTES.md` global de la raíz.
 3. ✅ **0003 — Primera capa: esquinas** (trigger R U R' U' repetido; posicionar por brújula; "confiar en el algoritmo").
 4. ✅ **0004 — Segunda capa: aristas** (regla "sin amarillo"; T invertida; algoritmos espejo der `U R U' R' U' F' U F` / izq `U' L' U L U F U' F'`; caso arista atascada).
 5. ✅ **0005 — Cruz amarilla** (orientar aristas ULT: `F R U R' U' F'` = sexy en sándwich; leer punto/L/línea; ignorar esquinas; aún NO empareja con centros).
-6. **0006 — Orientar la cruz / permutar aristas de arriba**.
+6. ✅ **0006 — Emparejar la cruz amarilla** (permutar aristas ULT: girar U p/ 2 coincidan; `R U R' U R U2 R' U` = Sune, con emparejadas atrás+derecha; casos adyacentes/opuestas/ninguna).
 7. **0007 — Ubicar esquinas** (posición).
 8. **0008 — Orientar esquinas / resolver** (el clásico "R' D' R D").
 9. **Hito:** resolver entero de memoria, cronometrar sin presión → hoja de referencia del método.

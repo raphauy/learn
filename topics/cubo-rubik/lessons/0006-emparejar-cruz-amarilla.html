@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
+<title>Cubo 6 — Emparejar la cruz amarilla: cada arista a su centro</title>
+<style>
+  :root{
+    --ink:#1b2233; --soft:#5d6478; --line:#e4e6ef; --bg:#fbfaf9;
+    --accent:#e11d48; --accent-soft:#fff1f4; --accent-line:#fbcfda; --accent-ink:#9f1239;
+    --accent2:#ea580c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(24,28,55,.07),0 8px 24px rgba(24,28,55,.06);
+    --cW:#f7f7f5; --cY:#ffd500; --cR:#d21f1f; --cO:#ff6d00; --cB:#1769d6; --cG:#2fa84a; --cGray:#e9ebf1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-size:33px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:12px; font-size:15px; color:var(--accent-ink)}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:46px 0 12px; letter-spacing:-.2px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px}
+  cite{font-style:italic}
+  em.q{font-style:italic; color:var(--accent-ink)}
+  code.mv{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:700;
+    background:#1b2233; color:#fff; padding:2px 8px; border-radius:7px; font-size:.92em; letter-spacing:.5px; white-space:nowrap}
+
+  /* algoritmo destacado */
+  .trigger{display:flex; gap:14px; align-items:center; flex-wrap:wrap; justify-content:center;
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin:20px 0; box-shadow:var(--shadow)}
+  .trigger .seq{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:23px; letter-spacing:1.5px;
+    background:#1b2233; color:#fff; padding:12px 18px; border-radius:12px}
+  .trigger .lab{font-size:14px; color:var(--soft); max-width:34ch}
+  .trigger .lab b{color:var(--accent)}
+
+  /* estados / casos de la cara de arriba */
+  .states{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:20px 0}
+  .state{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 12px 14px; box-shadow:var(--shadow); text-align:center}
+  .face{display:inline-grid; grid-template-columns:repeat(3,30px); grid-template-rows:repeat(3,30px); gap:3px}
+  .face .c{border-radius:5px; border:1px solid rgba(0,0,0,.08)}
+  .cy{background:var(--cY)} .cx{background:var(--cGray)} .cg{background:var(--cG)}
+  .state h4{margin:11px 0 3px; font-size:15.5px}
+  .state p{margin:0; font-size:12.5px; color:var(--soft); line-height:1.5}
+  .state .hold{display:block; margin-top:5px; font-weight:700; color:var(--accent-ink)}
+  .legend{display:flex; gap:18px; justify-content:center; flex-wrap:wrap; font-size:13px; color:var(--soft); margin:6px 0 2px}
+  .legend span{display:inline-flex; align-items:center; gap:6px}
+  .legend i{width:14px; height:14px; border-radius:4px; display:inline-block; border:1px solid rgba(0,0,0,.08)}
+
+  /* descomposición del algoritmo */
+  .cycle{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:18px 0}
+  .cyc{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 14px; box-shadow:var(--shadow); text-align:center}
+  .cyc .ico{font-size:22px}
+  .cyc h4{margin:8px 0 4px; font-size:15.5px}
+  .cyc p{margin:0; font-size:13px; color:var(--soft)}
+
+  .callout{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px}
+  .callout b{color:var(--accent2)}
+  .note{background:var(--accent-soft); border:1px solid var(--accent-line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15px; color:var(--accent-ink)}
+  .note b{color:var(--accent)}
+  .curio{background:#f5f3ff; border:1px solid #ddd6fe; border-left:4px solid #7c3aed;
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15px; color:#4c1d95}
+  .curio b{color:#6d28d9}
+
+  /* práctica / pasos */
+  .practice{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:18px 0; box-shadow:var(--shadow)}
+  .practice .lbl{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .practice h3{margin:10px 0 4px; font-size:20px}
+  .step{display:flex; gap:14px; align-items:flex-start; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line)}
+  .step:first-of-type{border-top:none}
+  .step .n{flex:none; width:28px; height:28px; border-radius:8px; background:var(--accent-soft); color:var(--accent);
+    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px}
+  .step b{font-size:15px}
+  .step p{margin:3px 0 0; font-size:13.5px; color:var(--soft)}
+  .step ul{margin:6px 0 0; padding-left:18px; font-size:13.5px; color:var(--soft)}
+  .step li{margin-bottom:4px}
+  .step li b{color:var(--ink)}
+  .winline{margin-top:16px; padding:12px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; font-size:14.5px; color:#14532d}
+  .winline b{color:var(--good)}
+
+  /* quiz */
+  .quiz{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:8px 8px 6px; margin:22px 0; box-shadow:var(--shadow); overflow:hidden}
+  .qhead{padding:16px 18px 6px}
+  .qhead h4{margin:0 0 2px; font-size:17px}
+  .qhead p{margin:0; font-size:13px; color:var(--soft)}
+  .q{padding:16px 18px; border-top:1px solid var(--line)}
+  .q .scn{font-size:15.5px; margin:0 0 12px}
+  .q .scn b{color:var(--accent-ink)}
+  .opt{display:block; width:100%; text-align:left; font:inherit; font-size:14.5px; color:var(--ink);
+    background:#fbfbfd; border:1.5px solid var(--line); border-radius:10px; padding:11px 14px; margin:8px 0; cursor:pointer; transition:all .12s}
+  .opt:hover{border-color:var(--accent-line); background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--good); background:#f0fdf4}
+  .opt.wrong{border-color:var(--bad); background:#fef2f2}
+  .fb{font-size:13.5px; margin:8px 2px 0; padding:11px 14px; border-radius:10px; display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0}
+  .fb.no{background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca}
+  .fb b{font-weight:800}
+  .qscore{padding:14px 18px; font-size:14.5px; font-weight:700; color:var(--accent); text-align:center; border-top:1px solid var(--line)}
+  .qscore.full{color:#fff; background:var(--accent)}
+
+  .ask{margin:40px 0 0; padding:18px 22px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:14px; font-size:15.5px; color:var(--accent-ink)}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    h1{font-size:27px}
+    .cycle{grid-template-columns:1fr}
+  }
+  @media print{
+    body{background:#fff}
+    .trigger,.cyc,.practice,.quiz,.state{box-shadow:none}
+    .callout,.note,.curio{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Cubo de Rubik · Lección 6 · Última capa</p>
+  <h1>Emparejar la cruz amarilla:<br>cada arista a su centro</h1>
+  <p class="sub">Ya tenés el amarillo mirando arriba. Ahora <b>ubicás</b> esas 4 aristas: girás y ciclás hasta que cada brazo caiga sobre su centro. Un solo algoritmo.</p>
+
+  <div class="mission">
+    <span>🎯</span>
+    <div><b>Por qué esta es TU lección.</b> Es la parte <b>ubicar</b> del par que aprendiste en la Lección 5: la cruz ya está
+    <b>orientada</b>, hoy la <b>permutás</b>. Al terminar, tu cruz amarilla queda <b>emparejada de verdad</b> —como la blanca— y la
+    última capa queda a un paso: solo faltan las esquinas.</div>
+  </div>
+
+  <p class="lede">Fijate que ahora la pregunta cambió: ya no es "¿mira el amarillo para arriba?" (eso está), sino
+  <b>"¿está cada arista en el lado que le toca?"</b>. Los brazos de tu cruz probablemente NO coinciden con los centros — este paso
+  los acomoda.<sup><a href="#r1">1</a></sup></p>
+
+  <div class="note">
+    <b>Orientar ✅ → ahora ubicar.</b> Igual que la <b>cruz blanca</b> de la Lección 2 tenía que estar <b>emparejada</b> con los
+    centros, la amarilla también. La diferencia: acá no bajás piezas, las <b>reordenás dentro de la última capa</b> con un algoritmo.
+  </div>
+
+  <h2>Paso 1 — Girá U y contá cuántas coinciden</h2>
+  <p>Girá <b>solo la cara de arriba</b> (<code class="mv">U</code>) y buscá la posición donde <b>2 aristas</b> queden emparejadas
+  con su centro (su color de costado continúa el centro de esa cara).<sup><a href="#r1">1</a></sup> Si con algún giro las
+  <b>4</b> coinciden, ya está: salteá el algoritmo.</p>
+
+  <h2>Paso 2 — El algoritmo que reordena las aristas</h2>
+  <p>Uno solo.<sup><a href="#r2">2</a></sup> Su trabajo: <b>reordenar las aristas de arriba</b> (y de paso revuelve las esquinas de
+  arriba, que <b>todavía no importan</b>). Sostené las <b>2 aristas ya emparejadas atrás y a la derecha</b>; las de adelante e
+  izquierda son las que se acomodan.<sup><a href="#r1">1</a></sup></p>
+
+  <div class="trigger">
+    <span class="seq">R U R' U R U2 R' U</span>
+    <span class="lab">Emparejadas <b>atrás + derecha</b>. Aplicás, y las aristas de <b>adelante e izquierda</b> se acomodan en su lado.</span>
+  </div>
+
+  <div class="curio">
+    <b>🧠 Dato para tu arco a CFOP.</b> El corazón de este algoritmo, <code class="mv">R U R' U R U2 R'</code>, se llama
+    <b>Sune</b> y es uno de los patrones más famosos del cubo. Acá lo usamos para <b>mover aristas</b> (podemos "romper" las
+    esquinas porque todavía no las tocamos); en CFOP el mismo Sune sirve para <b>orientar esquinas</b>.<sup><a href="#r3">3</a></sup>
+    Un mismo algoritmo, dos usos: eso es entender el cubo, no memorizarlo.
+  </div>
+
+  <h2>Los dos casos que te vas a encontrar</h2>
+  <p>Después de girar <code class="mv">U</code> para maximizar coincidencias, las 2 aristas emparejadas quedan de una de dos formas:</p>
+
+  <div class="legend">
+    <span><i style="background:var(--cG)"></i> arista ya emparejada</span>
+    <span><i style="background:var(--cGray)"></i> arista a acomodar</span>
+    <span><i style="background:var(--cY)"></i> centro amarillo</span>
+  </div>
+  <div class="states">
+    <div class="state">
+      <div class="face" aria-label="Dos aristas emparejadas adyacentes: atrás y derecha">
+        <div class="c cx"></div><div class="c cg"></div><div class="c cx"></div>
+        <div class="c cx"></div><div class="c cy"></div><div class="c cg"></div>
+        <div class="c cx"></div><div class="c cx"></div><div class="c cx"></div>
+      </div>
+      <h4>Adyacentes (en "L")</h4>
+      <p>Las 2 emparejadas comparten esquina.<span class="hold">Ponelas atrás + derecha → 1 aplicación</span></p>
+    </div>
+    <div class="state">
+      <div class="face" aria-label="Dos aristas emparejadas opuestas: atrás y adelante">
+        <div class="c cx"></div><div class="c cg"></div><div class="c cx"></div>
+        <div class="c cx"></div><div class="c cy"></div><div class="c cx"></div>
+        <div class="c cx"></div><div class="c cg"></div><div class="c cx"></div>
+      </div>
+      <h4>Opuestas (enfrentadas)</h4>
+      <p>Las 2 emparejadas están cara a cara.<span class="hold">Aplicá una vez → pasan a adyacentes → repetí</span></p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>La regla infalible.</b> ¿Ninguna arista coincide con su centro después de girar <code class="mv">U</code>? No te trabaste:
+    aplicá el algoritmo una vez desde cualquier ángulo y volvé a mirar — van a aparecer coincidencias.<sup><a href="#r2">2</a></sup>
+    Puede tomar <b>más de una pasada</b>; cada vez, reacomodá con <code class="mv">U</code> y reevaluá. Siempre converge.
+  </div>
+
+  <div class="practice">
+    <span class="lbl">Hacelo con el cubo en la mano</span>
+    <h3>Emparejar las 4 aristas de arriba</h3>
+
+    <div class="step">
+      <div class="n">1</div>
+      <div><b>Girá <code class="mv">U</code> hasta que 2 aristas coincidan con sus centros.</b> Si coinciden las 4, terminaste este paso.</div>
+    </div>
+    <div class="step">
+      <div class="n">2</div>
+      <div><b>Mirá cómo están las 2 emparejadas:</b>
+      <ul>
+        <li><b>Adyacentes:</b> sostenelas <b>atrás y a la derecha</b> y aplicá <code class="mv">R U R' U R U2 R' U</code> una vez.</li>
+        <li><b>Opuestas:</b> aplicá el algoritmo desde cualquier ángulo; quedan adyacentes. Volvé al inicio del paso.</li>
+      </ul></div>
+    </div>
+    <div class="step">
+      <div class="n">3</div>
+      <div><b>¿Ninguna coincidía?</b> Aplicá el algoritmo una vez, reacomodá con <code class="mv">U</code> y reevaluá. En 1–2 pasadas cae.</div>
+    </div>
+    <div class="step">
+      <div class="n">4</div>
+      <div><b>Cerrá con <code class="mv">U</code>:</b> cuando las 4 aristas estén en su lado, un último giro de <code class="mv">U</code> puede
+      hacer falta para que todos los brazos queden calzados sobre sus centros.<sup><a href="#r1">1</a></sup></div>
+    </div>
+
+    <div class="winline">
+      <b>Tu win de hoy:</b> la <b>cruz amarilla emparejada</b> — cada brazo continúa el color de su centro, igual que la cruz blanca.
+      Mirando el cubo desde arriba, ves una cruz amarilla y, en cada cara lateral, una <b>"T" de arista</b> alineada con su centro.
+      Es <b>normal</b> que las 4 esquinas de arriba estén revueltas: son la próxima (y última) etapa.
+    </div>
+  </div>
+
+  <h2>Probate: ¿ubicás bien las aristas?</h2>
+  <p>Cuatro escenarios. Feedback al toque.</p>
+
+  <div class="quiz" id="quiz">
+    <div class="qhead"><h4>Quiz de emparejar la cruz</h4><p>Tocá una opción para ver por qué.</p></div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>1.</b> En esta etapa, ¿qué estás resolviendo exactamente?</p>
+      <button class="opt" data-fb="Orientar (amarillo hacia arriba) fue la lección anterior y ya está hecho. Ahora el problema es otro: la posición.">Que el amarillo de las aristas mire hacia arriba.</button>
+      <button class="opt" data-fb="Exacto. Las aristas ya están orientadas; ahora las ubicás: que cada una quede en el lado cuyo centro le corresponde.">Que cada arista quede sobre el centro de su color.</button>
+      <button class="opt" data-fb="Las esquinas vienen después. Mezclar esquinas ahora confunde: este paso es solo de las 4 aristas de la cruz.">Que las esquinas amarillas queden en su lugar.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="2">
+      <p class="scn"><b>2.</b> Girás <code class="mv">U</code> y lográs que 2 aristas coincidan con sus centros, y quedan <b>adyacentes</b> (en L). ¿Cómo sostenés el cubo?</p>
+      <button class="opt" data-fb="Al frente e izquierda van las que hay que acomodar, no las ya emparejadas. Si ponés las buenas ahí, el algoritmo las desarma.">Las 2 emparejadas al frente y a la izquierda.</button>
+      <button class="opt" data-fb="Da igual solo cuando están opuestas. Si son adyacentes, la orientación importa: emparejadas atrás y derecha.">En cualquier posición, da igual.</button>
+      <button class="opt" data-fb="Correcto. Las 2 ya emparejadas van atrás y a la derecha (quedan quietas); las de adelante e izquierda son las que el algoritmo acomoda.">Las 2 emparejadas atrás y a la derecha.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="0">
+      <p class="scn"><b>3.</b> Al aplicar <code class="mv">R U R' U R U2 R' U</code> ves que las <b>esquinas</b> de arriba se revuelven. ¿Es un problema?</p>
+      <button class="opt" data-fb="No es problema. El algoritmo mueve aristas Y esquinas, pero las esquinas todavía no las resolviste, así que da igual: se acomodan en las próximas etapas.">No: las esquinas se resuelven después, da igual que se muevan ahora.</button>
+      <button class="opt" data-fb="No hace falta frenar ni corregir a mano: eso trabaría el cubo. Que las esquinas se muevan es parte normal de este algoritmo.">Sí: freno y acomodo las esquinas a mano.</button>
+      <button class="opt" data-fb="No estás usando el algoritmo equivocado: es justo el de esta etapa. Que toque las esquinas es esperado porque todavía no están resueltas.">Sí: estoy usando el algoritmo de otra etapa.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>4.</b> Después de girar <code class="mv">U</code>, <b>ninguna</b> arista coincide con su centro. ¿Qué hacés?</p>
+      <button class="opt" data-fb="No está sin solución: desde 'ninguna coincide' se sale aplicando el algoritmo una vez, que rompe la simetría y hace aparecer coincidencias.">Es un caso imposible; hay que desarmar y rehacer la cruz.</button>
+      <button class="opt" data-fb="Eso es. Aplicás el algoritmo una vez desde cualquier ángulo, después reacomodás con U y reevaluás: van a aparecer 2 coincidencias.">Aplico el algoritmo una vez, reacomodo con U y reevalúo.</button>
+      <button class="opt" data-fb="Girar U solo no alcanza si ninguna coincide en ningún giro: necesitás una pasada del algoritmo para cambiar el patrón.">Sigo girando U hasta que coincidan solas.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="qscore" id="qscore">0 / 4 — probá las cuatro</div>
+  </div>
+
+  <div class="ask">
+    <b>👋 Tu profe.</b> Si emparejaste la cruz amarilla, tenés <b>dos capas + la cruz de arriba resuelta</b>: te queda solo la
+    <b>última etapa</b>, las esquinas. La <b>Lección 7</b> las <b>ubica</b> (las lleva a su vértice, aunque queden mal giradas) y la
+    <b>Lección 8</b> las <b>orienta</b> para resolver el cubo entero. ¿El algoritmo te apareció con 2 adyacentes, opuestas, o ninguna?
+    ¿Cuántas pasadas te tomó? <b>Contame y cerramos el método.</b>
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">J Perm (Dylan Wang) — <cite>How To Solve The 3x3 Rubik's Cube</cite>, etapa "Match Cross Colors".
+        <a href="https://www.jperm.net/3x3">jperm.net/3x3</a>. <cite>"Turn the top face until 2 cross pieces match the side
+        color (if all 4 match, you have finished this step!)"</cite> · <cite>"Hold the 2 matching edges at the back/right. If they
+        are across from each other, hold them in any way."</cite></li>
+      <li id="r2">Ruwix — <cite>Beginner's Method</cite>, aristas de la última capa (notación exacta).
+        <a href="https://ruwix.com/the-rubiks-cube/how-to-solve-the-rubiks-cube-beginners-method/">ruwix.com</a>.
+        Algoritmo <code>R U R' U R U2 R' U</code>; intercambia las aristas de adelante e izquierda;
+        <cite>"you might face a situation when you have to apply this algorithm more than once"</cite>.</li>
+      <li id="r3">Sobre el "Sune": J Perm — <cite>CFOP / OLL</cite>.
+        <a href="https://www.jperm.net/3x3/cfop">jperm.net/3x3/cfop</a> · CubeSkills (Feliks Zemdegs)
+        <a href="https://www.cubeskills.com/tutorials/the-beginners-method-for-solving-the-rubiks-cube">cubeskills.com</a>.
+        <code>R U R' U R U2 R'</code> es un algoritmo canónico (Sune), reutilizado en CFOP para orientar esquinas.</li>
+    </ol>
+    <p>Más fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Términos en <a href="../GLOSSARY.md">GLOSSARY.md</a> · Tu misión en <a href="../MISSION.md">MISSION.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <a href="0005-cruz-amarilla.html">← Lección 5 · La cruz amarilla</a>
+      <span style="color:#b9bdd0">Próxima · Ubicar las esquinas de arriba (en construcción)</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const quiz = document.getElementById('quiz');
+  const qs = Array.from(quiz.querySelectorAll('.q'));
+  const scoreEl = document.getElementById('qscore');
+  const answered = new Array(qs.length).fill(false);
+
+  qs.forEach((q, qi) => {
+    const correct = parseInt(q.dataset.correct, 10);
+    const opts = Array.from(q.querySelectorAll('.opt'));
+    const fb = q.querySelector('.fb');
+    opts.forEach((opt, oi) => {
+      opt.addEventListener('click', () => {
+        const isRight = (oi === correct);
+        opt.classList.add(isRight ? 'right' : 'wrong');
+        fb.textContent = opt.dataset.fb;
+        fb.className = 'fb show ' + (isRight ? 'ok' : 'no');
+        if(!answered[qi]){
+          answered[qi] = isRight ? 'ok' : 'seen';
+          update();
+        }
+        if(isRight){
+          opts.forEach(o => o.disabled = true);
+        }
+      });
+    });
+  });
+
+  function update(){
+    const right = answered.filter(a => a === 'ok').length;
+    if(right === qs.length){
+      scoreEl.textContent = "✓ Las cuatro. Cruz amarilla emparejada: girar U, leer adyacentes/opuestas, y confiar en el algoritmo.";
+      scoreEl.classList.add('full');
+    } else {
+      scoreEl.textContent = right + " / " + qs.length + " resueltas — seguí probando";
+      scoreEl.classList.remove('full');
+    }
+  }
+})();
+</script>
+</body>
+</html>
