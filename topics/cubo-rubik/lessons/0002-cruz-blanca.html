@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
+<title>Cubo 2 — La cruz blanca: usá la brújula, no solo el color</title>
+<style>
+  :root{
+    --ink:#1b2233; --soft:#5d6478; --line:#e4e6ef; --bg:#fbfaf9;
+    --accent:#e11d48; --accent-soft:#fff1f4; --accent-line:#fbcfda; --accent-ink:#9f1239;
+    --accent2:#ea580c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(24,28,55,.07),0 8px 24px rgba(24,28,55,.06);
+    --cW:#f7f7f5; --cY:#ffd500; --cR:#d21f1f; --cO:#ff6d00; --cB:#1769d6; --cG:#2fa84a; --cGray:#e9ebf1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-size:33px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:12px; font-size:15px; color:var(--accent-ink)}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:46px 0 12px; letter-spacing:-.2px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px}
+  cite{font-style:italic}
+  em.q{font-style:italic; color:var(--accent-ink)}
+  code.mv{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:700;
+    background:#1b2233; color:#fff; padding:2px 8px; border-radius:7px; font-size:.92em; letter-spacing:.5px; white-space:nowrap}
+
+  /* caras 3x3 */
+  .faces{display:flex; gap:26px; flex-wrap:wrap; justify-content:center; margin:22px 0 6px}
+  .facewrap{text-align:center}
+  .face3{display:grid; grid-template-columns:repeat(3,34px); grid-template-rows:repeat(3,34px); gap:4px;
+    padding:6px; background:#20242e; border-radius:10px; box-shadow:var(--shadow)}
+  .cell{border-radius:5px; border:1.5px solid rgba(0,0,0,.16); box-shadow:inset 0 -2px 3px rgba(0,0,0,.10)}
+  .facecap{margin-top:9px; font-size:13px; color:var(--soft)}
+  .facecap b{color:var(--ink)}
+
+  /* matched vs unmatched */
+  .matchrow{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:20px 0}
+  .mcard{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; box-shadow:var(--shadow); text-align:center}
+  .mcard.good{border-color:#bbf7d0}
+  .mcard.bad{border-color:#fecaca}
+  .mcard h4{margin:0 0 12px; font-size:15px}
+  .mcard.good h4{color:var(--good)} .mcard.bad h4{color:var(--bad)}
+  .sides{display:flex; gap:8px; justify-content:center}
+  .side{display:flex; flex-direction:column; gap:3px; align-items:center}
+  .band{width:30px; height:22px; border-radius:4px; border:1.5px solid rgba(0,0,0,.16)}
+  .mcard p{margin:12px 0 0; font-size:13px; color:var(--soft)}
+  .mcard .verdict{font-size:24px; margin-top:8px}
+
+  .callout{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px}
+  .callout b{color:var(--accent2)}
+  .note{background:var(--accent-soft); border:1px solid var(--accent-line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15px; color:var(--accent-ink)}
+  .note b{color:var(--accent)}
+
+  /* práctica / pasos */
+  .practice{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:18px 0; box-shadow:var(--shadow)}
+  .practice .lbl{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .practice h3{margin:10px 0 4px; font-size:20px}
+  .step{display:flex; gap:14px; align-items:flex-start; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line)}
+  .step:first-of-type{border-top:none}
+  .step .n{flex:none; width:28px; height:28px; border-radius:8px; background:var(--accent-soft); color:var(--accent);
+    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px}
+  .step b{font-size:15px}
+  .step p{margin:3px 0 0; font-size:13.5px; color:var(--soft)}
+  .step ul{margin:6px 0 0; padding-left:18px; font-size:13.5px; color:var(--soft)}
+  .step li{margin-bottom:4px}
+  .step li b{color:var(--ink)}
+  .winline{margin-top:16px; padding:12px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; font-size:14.5px; color:#14532d}
+  .winline b{color:var(--good)}
+
+  /* quiz */
+  .quiz{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:8px 8px 6px; margin:22px 0; box-shadow:var(--shadow); overflow:hidden}
+  .qhead{padding:16px 18px 6px}
+  .qhead h4{margin:0 0 2px; font-size:17px}
+  .qhead p{margin:0; font-size:13px; color:var(--soft)}
+  .q{padding:16px 18px; border-top:1px solid var(--line)}
+  .q .scn{font-size:15.5px; margin:0 0 12px}
+  .q .scn b{color:var(--accent-ink)}
+  .opt{display:block; width:100%; text-align:left; font:inherit; font-size:14.5px; color:var(--ink);
+    background:#fbfbfd; border:1.5px solid var(--line); border-radius:10px; padding:11px 14px; margin:8px 0; cursor:pointer; transition:all .12s}
+  .opt:hover{border-color:var(--accent-line); background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--good); background:#f0fdf4}
+  .opt.wrong{border-color:var(--bad); background:#fef2f2}
+  .fb{font-size:13.5px; margin:8px 2px 0; padding:11px 14px; border-radius:10px; display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0}
+  .fb.no{background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca}
+  .fb b{font-weight:800}
+  .qscore{padding:14px 18px; font-size:14.5px; font-weight:700; color:var(--accent); text-align:center; border-top:1px solid var(--line)}
+  .qscore.full{color:#fff; background:var(--accent)}
+
+  .ask{margin:40px 0 0; padding:18px 22px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:14px; font-size:15.5px; color:var(--accent-ink)}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    h1{font-size:27px}
+    .matchrow{grid-template-columns:1fr}
+    .face3{grid-template-columns:repeat(3,30px); grid-template-rows:repeat(3,30px)}
+  }
+  @media print{
+    body{background:#fff}
+    .mcard,.practice,.quiz,.face3{box-shadow:none}
+    .callout,.note{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Cubo de Rubik · Lección 2 · Primera capa</p>
+  <h1>La cruz blanca:<br>usá la brújula, no solo el color</h1>
+  <p class="sub">Tu primer paso real de armado. Casi intuitivo, casi sin algoritmos — pero con una trampa que arruina el 90% de los intentos de principiante.</p>
+
+  <div class="mission">
+    <span>🎯</span>
+    <div><b>Por qué esta es TU lección.</b> En la Lección 1 aprendiste que <b>los centros son la brújula</b>. Hoy la
+    <b>usás por primera vez</b>. Armar de memoria empieza acá: no vas a "poner blancos donde sea", vas a leer los centros y
+    llevar cada arista a <em>su</em> lugar. Es la diferencia entre revolver y resolver.</div>
+  </div>
+
+  <p class="lede">El objetivo de hoy es una <b>cruz blanca en una cara</b>… pero no cualquier cruz. Una cruz
+  <b>emparejada</b>: cada arista blanca alineada con el centro del color que le toca al costado.<sup><a href="#r1">1</a></sup></p>
+
+  <h2>La trampa: cruz linda ≠ cruz correcta</h2>
+  <p>Mirá estas dos cruces blancas. Desde arriba (la cara blanca) las dos parecen perfectas. La diferencia está en
+  <b>los costados</b>: en una, cada arista continúa el color de su centro; en la otra, no. Solo la primera sirve.</p>
+
+  <div class="matchrow">
+    <div class="mcard good">
+      <h4>✔ Cruz emparejada</h4>
+      <div class="sides">
+        <div class="side"><span class="band" style="background:var(--cR)"></span><span class="band" style="background:var(--cR)"></span></div>
+        <div class="side"><span class="band" style="background:var(--cG)"></span><span class="band" style="background:var(--cG)"></span></div>
+        <div class="side"><span class="band" style="background:var(--cO)"></span><span class="band" style="background:var(--cO)"></span></div>
+        <div class="side"><span class="band" style="background:var(--cB)"></span><span class="band" style="background:var(--cB)"></span></div>
+      </div>
+      <div class="verdict">🙂</div>
+      <p>Arriba la arista, abajo el centro: <b>mismo color</b> en cada costado. La pieza está en su casa.</p>
+    </div>
+    <div class="mcard bad">
+      <h4>✘ Cruz "linda" pero mal</h4>
+      <div class="sides">
+        <div class="side"><span class="band" style="background:var(--cG)"></span><span class="band" style="background:var(--cR)"></span></div>
+        <div class="side"><span class="band" style="background:var(--cB)"></span><span class="band" style="background:var(--cG)"></span></div>
+        <div class="side"><span class="band" style="background:var(--cR)"></span><span class="band" style="background:var(--cO)"></span></div>
+        <div class="side"><span class="band" style="background:var(--cO)"></span><span class="band" style="background:var(--cB)"></span></div>
+      </div>
+      <div class="verdict">🚫</div>
+      <p>Arista y centro <b>no coinciden</b>. La cruz blanca está, pero las piezas están en la casa equivocada: todo lo que sigue se rompe.</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>La regla de oro de hoy</b> (fuente Ruwix, textual): <em class="q">"primero hacemos una cruz blanca prestando atención
+    al color de los centros de los costados"</em>.<sup><a href="#r1">1</a></sup> Emparejar arista con centro <b>es</b> el paso.
+    La cruz blanca es solo el subproducto visible.
+  </div>
+
+  <h2>El método de la margarita (daisy)</h2>
+  <p>Hacer la cruz directamente en la cara de abajo es difícil porque no la ves. El truco de principiante es armar primero
+  una <b>margarita</b> arriba —donde SÍ la ves— y recién ahí bajar cada pétalo a su lugar.<sup><a href="#r2">2</a></sup></p>
+
+  <div class="faces">
+    <div class="facewrap">
+      <div class="face3">
+        <span class="cell" style="background:var(--cGray)"></span><span class="cell" style="background:var(--cW)"></span><span class="cell" style="background:var(--cGray)"></span>
+        <span class="cell" style="background:var(--cW)"></span><span class="cell" style="background:var(--cY)"></span><span class="cell" style="background:var(--cW)"></span>
+        <span class="cell" style="background:var(--cGray)"></span><span class="cell" style="background:var(--cW)"></span><span class="cell" style="background:var(--cGray)"></span>
+      </div>
+      <div class="facecap"><b>La margarita</b><br>centro amarillo · 4 pétalos blancos</div>
+    </div>
+    <div class="facewrap">
+      <div class="face3">
+        <span class="cell" style="background:var(--cGray)"></span><span class="cell" style="background:var(--cW)"></span><span class="cell" style="background:var(--cGray)"></span>
+        <span class="cell" style="background:var(--cW)"></span><span class="cell" style="background:var(--cW)"></span><span class="cell" style="background:var(--cW)"></span>
+        <span class="cell" style="background:var(--cGray)"></span><span class="cell" style="background:var(--cW)"></span><span class="cell" style="background:var(--cGray)"></span>
+      </div>
+      <div class="facecap"><b>La meta (cara de abajo)</b><br>cruz blanca, ya emparejada</div>
+    </div>
+  </div>
+
+  <div class="practice">
+    <span class="lbl">Hacelo con el cubo en la mano</span>
+    <h3>De la margarita a la cruz, en 4 movimientos de mente</h3>
+
+    <div class="step">
+      <div class="n">1</div>
+      <div><b>Orientá: amarillo arriba, blanco abajo.</b> Buscá el centro amarillo y ponelo en la cara de arriba (U). El
+      centro blanco queda abajo (D). Esos dos no se mueven más en toda la lección: son tu marco.</div>
+    </div>
+
+    <div class="step">
+      <div class="n">2</div>
+      <div><b>Armá la margarita: los 4 pétalos blancos alrededor del amarillo, con el blanco mirando para arriba.</b>
+      Es la parte intuitiva —jugá y buscá las 4 aristas blancas. Según dónde esté cada una:
+      <ul>
+        <li>Con el <b>blanco mirando hacia abajo</b> (cara D): ponela debajo de un hueco de pétalo libre y girá esa cara
+          lateral <b>dos veces</b> (ej. <code class="mv">F2</code>) para subirla a la margarita.</li>
+        <li>Con el <b>blanco mirando a un costado</b> (capa de arriba o del medio): con un cuarto de giro bajala primero al
+          piso con el blanco hacia abajo, usando una cara cuyo pétalo <b>todavía esté vacío</b>, y aplicá la regla de arriba.</li>
+        <li>Regla general: no rompas pétalos ya puestos. Si dudás, giralos fuera del camino con la cara de arriba (U) —los
+          pétalos viajan, no se caen.</li>
+      </ul></div>
+    </div>
+
+    <div class="step">
+      <div class="n">3</div>
+      <div><b>Emparejá y bajá, un pétalo por vez.</b> Girá <b>solo la cara de arriba</b> (U) hasta que el
+      <b>color del costado</b> de un pétalo coincida con el <b>centro de esa cara lateral</b>. Cuando coinciden, girá esa
+      cara lateral <b>dos veces</b> (<code class="mv">F2</code>) y el pétalo baja derecho a la cruz, ya emparejado.
+      <p>¿Te acordás del <code class="mv">2</code> de la Lección 1? Media vuelta. Es casi todo lo que usás hoy.</p></div>
+    </div>
+
+    <div class="step">
+      <div class="n">4</div>
+      <div><b>Repetí para los otros 3 — una vuelta doble por cada cara lateral, una sola vez cada una.</b> Entre pétalo y
+      pétalo girás U para traer el siguiente sobre su centro; eso nunca toca los que ya bajaron. Regla anti-desastre:
+      <b>no le des dos veces a la misma cara lateral</b>, o sacás un pétalo ya colocado.</div>
+    </div>
+
+    <div class="winline">
+      <b>Tu win de hoy:</b> dá vuelta el cubo (blanco arriba). Tenés una <b>cruz blanca</b> y, mirando cada costado, la
+      arista <b>continúa el color de su centro</b> (una "T" del mismo color bajo cada centro). Si las 4 coinciden, armaste
+      tu primera pieza real del método — leyendo la brújula, casi sin algoritmos. Si alguna no coincide, girá esa cara
+      lateral dos veces para sacar el pétalo, reacomodalo arriba y bajalo de nuevo. <b>No se rompe nada.</b>
+    </div>
+  </div>
+
+  <h2>Probate: ¿emparejaste de verdad?</h2>
+  <p>Cuatro escenarios. Feedback al toque; probá sin miedo.</p>
+
+  <div class="quiz" id="quiz">
+    <div class="qhead"><h4>Quiz de la cruz</h4><p>Tocá una opción para ver por qué.</p></div>
+
+    <div class="q" data-correct="2">
+      <p class="scn"><b>1.</b> Tenés las 4 aristas blancas formando una cruz blanca perfecta en la cara de abajo. ¿Ya está el paso?</p>
+      <button class="opt" data-fb="No alcanza con que se vea blanca. La mitad del trabajo (y el que casi nadie hace) es que cada arista coincida con su centro lateral.">Sí: si las 4 son blancas y forman cruz, listo.</button>
+      <button class="opt" data-fb="La cantidad de giros no dice nada del resultado. Lo que importa es si cada arista quedó emparejada con su centro, no cuánto tardaste.">Depende de cuántos movimientos me llevó.</button>
+      <button class="opt" data-fb="Exacto. La cruz blanca es necesaria pero no suficiente: solo cuenta si cada arista blanca coincide con el color del centro de su costado. Esa es la trampa de la lección.">Solo si además cada arista coincide con su centro lateral.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>2.</b> Un pétalo de la margarita tiene su costado <b>rojo</b>. ¿Sobre qué centro lo tenés que alinear (girando U) antes de bajarlo?</p>
+      <button class="opt" data-fb="El centro amarillo es el de arriba (el corazón de la margarita), no un centro lateral. La arista baja a un costado, no al amarillo.">Sobre el centro amarillo, arriba.</button>
+      <button class="opt" data-fb="Correcto. La arista roja-blanca vive entre el centro blanco (abajo) y el centro ROJO (un costado). Alineás el pétalo sobre el centro rojo y recién ahí F2.">Sobre el centro rojo del costado, y ahí bajarla.</button>
+      <button class="opt" data-fb="El centro que le toca no es 'el que quede más cerca': es el de SU color. Una arista roja-blanca solo está en casa sobre el centro rojo.">Sobre cualquier centro que quede cerca; da igual.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="0">
+      <p class="scn"><b>3.</b> Vas a bajar un pétalo con <code class="mv">F2</code>, pero en la cara de abajo del Frente <b>ya hay</b> una arista de la cruz colocada. ¿Qué pasa si igual hacés <code class="mv">F2</code>?</p>
+      <button class="opt" data-fb="Correcto. F2 intercambia la de arriba con la de abajo del Frente: sacás la que ya estaba. Por eso la regla es una sola vuelta doble por cara, con el hueco de abajo vacío.">Saco la arista que ya estaba: hay que evitarlo.</button>
+      <button class="opt" data-fb="No: F2 sí mueve la arista de abajo del Frente (la manda arriba). No es inofensivo si ese lugar ya estaba resuelto.">Nada, la de abajo no se mueve con F2.</button>
+      <button class="opt" data-fb="F2 no 'arregla' nada mágicamente: mueve piezas. Si abajo ya había una arista buena, la desacomoda. Elegí otra cara o reacomodá primero.">Se emparejan las dos solas, mejor todavía.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>4.</b> ¿Por qué en toda la lección solo movés la cara de arriba (U) y hacés vueltas dobles (F2, R2…), y casi nunca cuartos de giro sueltos abajo?</p>
+      <button class="opt" data-fb="No es por una regla arbitraria: es porque esos movimientos son los que bajan un pétalo SIN desarmar los ya puestos. La lógica importa más que la prohibición.">Porque está prohibido usar otros movimientos en este paso.</button>
+      <button class="opt" data-fb="Eso es. U reordena los pétalos sin tocar la cruz de abajo, y una vuelta doble mete el pétalo derecho a su lugar sin voltearlo. Son los giros que preservan lo hecho.">Porque U reordena arriba sin tocar la cruz, y el doble baja el pétalo sin romperlo.</button>
+      <button class="opt" data-fb="La velocidad no es el motivo acá (recién arrancás). El motivo es no desarmar lo ya colocado mientras acomodás el resto.">Porque son los movimientos más rápidos para hacer tiempo.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="qscore" id="qscore">0 / 4 — probá las cuatro</div>
+  </div>
+
+  <div class="ask">
+    <b>👋 Tu profe.</b> Si diste vuelta el cubo y viste la cruz con las 4 "T" del mismo color, <b>ya sabés leer la brújula</b>
+    — el hábito que sostiene todo el método. La <b>Lección 3</b> es el complemento natural: bajar las <b>4 esquinas blancas</b>
+    para completar la primera capa entera, y ahí vas a reusar tu viejo amigo <code class="mv">R U R' U'</code>. ¿Te salió la
+    cruz emparejada? ¿Cuánto te costó la margarita? Si alguna arista se te resiste (el caso del blanco mirando al costado
+    suele trabar), <b>contame cómo está parada y la desarmamos juntos.</b>
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">Ruwix — <cite>How To Solve The Rubik's Cube: Beginners Method</cite>, Paso 1 (cruz blanca).
+        <a href="https://ruwix.com/the-rubiks-cube/how-to-solve-the-rubiks-cube-beginners-method/">ruwix.com</a>.
+        <cite>"First we have to make a white cross paying attention to the color of the side center pieces"</cite>; advierte
+        contra la cruz con los costados sin emparejar.</li>
+      <li id="r2">Método de la margarita (daisy) para principiantes: armar los pétalos blancos alrededor del centro amarillo
+        y bajarlos con una vuelta doble a la cruz, emparejando con los centros.
+        <a href="https://www.speedsolving.com/wiki/index.php/Daisy_Method">speedsolving.com — Daisy Method</a>.</li>
+      <li id="r3">J Perm (Dylan Wang) — <cite>How To Solve The 3x3 Rubik's Cube</cite>, etapa "White Cross".
+        <a href="https://www.jperm.net/3x3">jperm.net/3x3</a>. La cruz blanca es el primer paso del método; recomienda
+        no apurar los pasos siguientes hasta tenerla fluida.</li>
+    </ol>
+    <p>Más fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Términos en <a href="../GLOSSARY.md">GLOSSARY.md</a> · Tu misión en <a href="../MISSION.md">MISSION.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <a href="0001-anatomia-y-notacion.html">← Lección 1 · Anatomía y notación</a>
+      <span style="color:#b9bdd0">Próxima · Esquinas de la primera capa (en construcción)</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const quiz = document.getElementById('quiz');
+  const qs = Array.from(quiz.querySelectorAll('.q'));
+  const scoreEl = document.getElementById('qscore');
+  const answered = new Array(qs.length).fill(false);
+
+  qs.forEach((q, qi) => {
+    const correct = parseInt(q.dataset.correct, 10);
+    const opts = Array.from(q.querySelectorAll('.opt'));
+    const fb = q.querySelector('.fb');
+    opts.forEach((opt, oi) => {
+      opt.addEventListener('click', () => {
+        const isRight = (oi === correct);
+        opt.classList.add(isRight ? 'right' : 'wrong');
+        fb.textContent = opt.dataset.fb;
+        fb.className = 'fb show ' + (isRight ? 'ok' : 'no');
+        if(!answered[qi]){
+          answered[qi] = isRight ? 'ok' : 'seen';
+          update();
+        }
+        if(isRight){
+          opts.forEach(o => o.disabled = true);
+        }
+      });
+    });
+  });
+
+  function update(){
+    const right = answered.filter(a => a === 'ok').length;
+    if(right === qs.length){
+      scoreEl.textContent = "✓ Las cuatro. Cruz emparejada = brújula dominada. A por las esquinas.";
+      scoreEl.classList.add('full');
+    } else {
+      scoreEl.textContent = right + " / " + qs.length + " resueltas — seguí probando";
+      scoreEl.classList.remove('full');
+    }
+  }
+})();
+</script>
+</body>
+</html>

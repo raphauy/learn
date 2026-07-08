@@ -54,6 +54,23 @@ El algoritmo más usado del método: **R U R' U'**. Repetido 6 veces devuelve el
 (demuestra que los algoritmos son cíclicos y deterministas).
 _Avoid_: el movimiento ese
 
+## Primera capa
+
+**Emparejar (una pieza con su centro)**:
+Ubicar una pieza de modo que su(s) color(es) de costado coincidan con el/los **centro(s)** de esa(s)
+cara(s). Es "usar la brújula": el criterio de que una pieza está en su casa.
+_Avoid_: alinear a ojo, que quede lindo
+
+**Cruz blanca**:
+Las 4 aristas blancas puestas alrededor del centro blanco y **emparejadas** con los centros
+laterales. Primer paso real del método. Una cruz blanca NO emparejada no cuenta.
+_Avoid_: cruz (a secas)
+
+**Margarita (daisy)**:
+Técnica de principiante para la cruz: se arman los 4 pétalos blancos alrededor del centro **amarillo**
+(arriba) y se bajan de a uno con una vuelta doble (`F2`), emparejando con cada centro.
+_Avoid_: la flor
+
 ## Método (para más adelante)
 
 **Método principiante (capa por capa / LBL)**:

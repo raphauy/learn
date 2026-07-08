@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
+<title>Cubo 3 — Las esquinas blancas: sacar, girar, meter (y confiar en el algoritmo)</title>
+<style>
+  :root{
+    --ink:#1b2233; --soft:#5d6478; --line:#e4e6ef; --bg:#fbfaf9;
+    --accent:#e11d48; --accent-soft:#fff1f4; --accent-line:#fbcfda; --accent-ink:#9f1239;
+    --accent2:#ea580c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(24,28,55,.07),0 8px 24px rgba(24,28,55,.06);
+    --cW:#f7f7f5; --cY:#ffd500; --cR:#d21f1f; --cO:#ff6d00; --cB:#1769d6; --cG:#2fa84a; --cGray:#e9ebf1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-size:33px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:12px; font-size:15px; color:var(--accent-ink)}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:46px 0 12px; letter-spacing:-.2px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px}
+  cite{font-style:italic}
+  em.q{font-style:italic; color:var(--accent-ink)}
+  code.mv{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:700;
+    background:#1b2233; color:#fff; padding:2px 8px; border-radius:7px; font-size:.92em; letter-spacing:.5px; white-space:nowrap}
+
+  /* trigger destacado */
+  .trigger{display:flex; gap:14px; align-items:center; flex-wrap:wrap; justify-content:center;
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin:20px 0; box-shadow:var(--shadow)}
+  .trigger .seq{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:26px; letter-spacing:2px;
+    background:#1b2233; color:#fff; padding:10px 18px; border-radius:12px}
+  .trigger .lab{font-size:14px; color:var(--soft); max-width:34ch}
+  .trigger .lab b{color:var(--accent)}
+
+  /* pasos del ciclo */
+  .cycle{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:18px 0}
+  .cyc{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 14px; box-shadow:var(--shadow); text-align:center}
+  .cyc .ico{font-size:26px}
+  .cyc h4{margin:8px 0 4px; font-size:15.5px}
+  .cyc p{margin:0; font-size:13px; color:var(--soft)}
+
+  .callout{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px}
+  .callout b{color:var(--accent2)}
+  .note{background:var(--accent-soft); border:1px solid var(--accent-line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15px; color:var(--accent-ink)}
+  .note b{color:var(--accent)}
+
+  /* práctica / pasos */
+  .practice{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:18px 0; box-shadow:var(--shadow)}
+  .practice .lbl{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .practice h3{margin:10px 0 4px; font-size:20px}
+  .step{display:flex; gap:14px; align-items:flex-start; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line)}
+  .step:first-of-type{border-top:none}
+  .step .n{flex:none; width:28px; height:28px; border-radius:8px; background:var(--accent-soft); color:var(--accent);
+    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px}
+  .step b{font-size:15px}
+  .step p{margin:3px 0 0; font-size:13.5px; color:var(--soft)}
+  .step ul{margin:6px 0 0; padding-left:18px; font-size:13.5px; color:var(--soft)}
+  .step li{margin-bottom:4px}
+  .step li b{color:var(--ink)}
+  .winline{margin-top:16px; padding:12px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; font-size:14.5px; color:#14532d}
+  .winline b{color:var(--good)}
+
+  /* quiz */
+  .quiz{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:8px 8px 6px; margin:22px 0; box-shadow:var(--shadow); overflow:hidden}
+  .qhead{padding:16px 18px 6px}
+  .qhead h4{margin:0 0 2px; font-size:17px}
+  .qhead p{margin:0; font-size:13px; color:var(--soft)}
+  .q{padding:16px 18px; border-top:1px solid var(--line)}
+  .q .scn{font-size:15.5px; margin:0 0 12px}
+  .q .scn b{color:var(--accent-ink)}
+  .opt{display:block; width:100%; text-align:left; font:inherit; font-size:14.5px; color:var(--ink);
+    background:#fbfbfd; border:1.5px solid var(--line); border-radius:10px; padding:11px 14px; margin:8px 0; cursor:pointer; transition:all .12s}
+  .opt:hover{border-color:var(--accent-line); background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--good); background:#f0fdf4}
+  .opt.wrong{border-color:var(--bad); background:#fef2f2}
+  .fb{font-size:13.5px; margin:8px 2px 0; padding:11px 14px; border-radius:10px; display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0}
+  .fb.no{background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca}
+  .fb b{font-weight:800}
+  .qscore{padding:14px 18px; font-size:14.5px; font-weight:700; color:var(--accent); text-align:center; border-top:1px solid var(--line)}
+  .qscore.full{color:#fff; background:var(--accent)}
+
+  .ask{margin:40px 0 0; padding:18px 22px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:14px; font-size:15.5px; color:var(--accent-ink)}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    h1{font-size:27px}
+    .cycle{grid-template-columns:1fr}
+  }
+  @media print{
+    body{background:#fff}
+    .trigger,.cyc,.practice,.quiz{box-shadow:none}
+    .callout,.note{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Cubo de Rubik · Lección 3 · Primera capa</p>
+  <h1>Las esquinas blancas:<br>sacar, girar, meter</h1>
+  <p class="sub">Cerrás la primera capa entera con un solo algoritmo — el que ya conocés. Y aprendés el hábito mental que sostiene TODO el método: confiar en el algoritmo.</p>
+
+  <div class="mission">
+    <span>🎯</span>
+    <div><b>Por qué esta es TU lección.</b> Hoy juntás tus dos herramientas: la <b>brújula</b> (Lección 2) para saber
+    a dónde va cada esquina, y el <b>sexy move <code class="mv">R U R' U'</code></b> (Lección 1) para meterla. Al terminar
+    tenés la <b>primera capa completa</b> —un tercio del cubo, resuelto de memoria— y una cara blanca entera de premio.</div>
+  </div>
+
+  <p class="lede">La esquina blanca tiene <b>3 stickers</b>: blanco + otros dos colores. Esos dos colores te dicen exactamente
+  entre qué dos centros vive.<sup><a href="#r1">1</a></sup> El resto es un gesto que ya sabés, repetido hasta que cae.</p>
+
+  <h2>La idea: cada esquina tiene una única casa</h2>
+  <p>Una esquina blanca-roja-verde solo está en su casa en <b>un</b> lugar: el vértice donde se tocan los centros blanco,
+  rojo y verde. Como en la cruz, no la ponés "donde entre": la <b>leés</b> y la mandás a su esquina.</p>
+
+  <div class="note">
+    <b>Tu marco no cambia:</b> seguís con <b>blanco abajo, amarillo arriba</b>. Las esquinas blancas que te faltan las vas
+    a buscar arriba (en la capa amarilla) o rescatar de un hueco mal puesto. Nunca tocás la cruz que ya armaste… aunque por
+    un segundo <em>parezca</em> que sí. Ese "parece" es la lección de hoy.
+  </div>
+
+  <h2>El gesto: R U R' U', repetido</h2>
+  <p>Ponés la esquina en la capa de arriba, <b>justo encima de su casa</b>, la sostenés en el <b>frente-derecha</b> y
+  repetís el trigger hasta que el blanco caiga en su lugar.<sup><a href="#r2">2</a></sup></p>
+
+  <div class="trigger">
+    <span class="seq">R U R' U'</span>
+    <span class="lab">Tu <b>sexy move</b> de la Lección 1. Acá no lo hacés 6 veces para volver al inicio: lo hacés
+    <b>1, 3 o 5 veces</b> —según cómo esté parado el blanco— y la esquina se sienta sola.</span>
+  </div>
+
+  <p>Por qué funciona, en tres tiempos (esto es "entenderlo", no memorizarlo):</p>
+  <div class="cycle">
+    <div class="cyc"><div class="ico">⬇️</div><h4>Saca</h4><p>La primera mitad baja la esquina al piso y la aparta.</p></div>
+    <div class="cyc"><div class="ico">🔄</div><h4>Gira</h4><p>Mientras está abajo, la reorienta un paso.</p></div>
+    <div class="cyc"><div class="ico">⬆️</div><h4>Mete</h4><p>La devuelve arriba, girada. Repetís hasta que el blanco queda abajo.</p></div>
+  </div>
+
+  <div class="callout">
+    <b>Confiá en el algoritmo.</b> A la mitad del trigger vas a ver la cruz "romperse" y colores desacomodarse. No la
+    toques ni corrijas a mano: el algoritmo <b>devuelve todo a su lugar</b> al completarse.<sup><a href="#r2">2</a></sup>
+    Este acto de fe —dejar que la secuencia termine— es exactamente lo que separa armar de memoria de trabar el cubo.
+  </div>
+
+  <div class="practice">
+    <span class="lbl">Hacelo con el cubo en la mano</span>
+    <h3>Bajar las 4 esquinas, una por una</h3>
+
+    <div class="step">
+      <div class="n">1</div>
+      <div><b>Elegí una esquina blanca que esté en la capa de arriba.</b> Mirá sus otros dos colores (ej. rojo y verde).
+      Esos dos definen su casa: el vértice de los centros rojo y verde.</div>
+    </div>
+    <div class="step">
+      <div class="n">2</div>
+      <div><b>Girá solo la capa de arriba (U) para dejar la esquina justo ENCIMA de su casa.</b> Debe quedar en el vértice
+      donde ya se ven sus dos centros (rojo y verde) en las caras laterales. Ahora sostené el cubo con esa esquina en el
+      <b>frente-derecha-arriba</b>.</div>
+    </div>
+    <div class="step">
+      <div class="n">3</div>
+      <div><b>Repetí <code class="mv">R U R' U'</code> hasta que la esquina quede resuelta</b> (blanco abajo, y sus dos
+      colores continuando los centros). Te va a tomar 1, 3 o 5 veces. Dejá terminar cada repetición completa; no cortes a la mitad.</div>
+    </div>
+    <div class="step">
+      <div class="n">4</div>
+      <div><b>¿La esquina blanca está atascada abajo, en un hueco pero mal puesta?</b> Sacala: ponela en el frente-derecha
+      (abajo) y hacé <code class="mv">R U R' U'</code> una vez para que suba a la capa de arriba. Después volvé al paso 1 con ella.
+      <ul><li><b>Zurdo o te queda cómoda a la izquierda:</b> existe el espejo <code class="mv">L' U' L U</code> sosteniéndola en el frente-izquierda. Con dominar una alcanza.</li></ul></div>
+    </div>
+
+    <div class="winline">
+      <b>Tu win de hoy:</b> las 4 esquinas abajo → <b>primera capa completa</b>. La cara blanca es un cuadrado blanco sólido,
+      y las 4 caras laterales muestran su color emparejado formando una <b>"T" completa</b> (cruz + esquinas del mismo color
+      bajo cada centro). Un tercio del cubo, de memoria. Si una esquina no cierra, casi siempre no estaba encima de su casa:
+      revisá el paso 2 y repetí. <b>Nada se rompe de verdad.</b>
+    </div>
+  </div>
+
+  <h2>Probate: ¿pensás como resolvedor?</h2>
+  <p>Cuatro escenarios. Feedback al toque.</p>
+
+  <div class="quiz" id="quiz">
+    <div class="qhead"><h4>Quiz de esquinas</h4><p>Tocá una opción para ver por qué.</p></div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>1.</b> Tenés una esquina blanca-azul-naranja en la capa de arriba. ¿Dónde es su casa?</p>
+      <button class="opt" data-fb="El blanco te dice que va en la capa blanca (abajo), pero 'cualquier hueco' no: una esquina de 3 colores tiene UN solo vértice correcto.">En cualquier hueco libre de la capa blanca.</button>
+      <button class="opt" data-fb="Exacto. Sus tres colores (blanco, azul, naranja) solo coexisten en el vértice donde se tocan los centros blanco, azul y naranja. Ahí y solo ahí.">En el vértice de los centros blanco, azul y naranja.</button>
+      <button class="opt" data-fb="El centro amarillo es el de arriba; la esquina es blanca, va abajo. Además una esquina no se define por un centro solo, sino por los tres que la rodean.">Sobre el centro amarillo, arriba.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="0">
+      <p class="scn"><b>2.</b> Vas por la mitad de <code class="mv">R U R' U'</code> y ves que tu cruz blanca "se rompió". ¿Qué hacés?</p>
+      <button class="opt" data-fb="Sí. El algoritmo desarma y rearma: si lo dejás completar (y repetís si hace falta), la cruz vuelve intacta. Cortar o corregir a mano es lo que trabás el cubo.">Sigo y completo la secuencia; el algoritmo la devuelve.</button>
+      <button class="opt" data-fb="Justo lo contrario: acomodar a mano en el medio rompe la lógica del algoritmo y sí desarma el cubo de verdad. Confiá en la secuencia.">Freno y acomodo la cruz a mano antes de seguir.</button>
+      <button class="opt" data-fb="No hace falta reiniciar: no está roto, está a mitad de camino. Completá el trigger y mirá el resultado final.">Deshago todo y vuelvo a empezar de cero.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="2">
+      <p class="scn"><b>3.</b> Una esquina blanca quedó abajo, encajada en un hueco, pero con el blanco de costado (mal orientada). ¿Cómo la arreglás?</p>
+      <button class="opt" data-fb="Girar solo la capa de abajo no reorienta la esquina: la pasea mal puesta. Hay que sacarla a la capa de arriba primero.">Giro la capa de abajo hasta que se acomode.</button>
+      <button class="opt" data-fb="A mano no: eso implica sacar la pieza forzándola. Se saca con un algoritmo, no con los dedos.">La saco tirando de la pieza y la doy vuelta.</button>
+      <button class="opt" data-fb="Correcto. La sostenés en el frente-derecha y con un R U R' U' sube a la capa de arriba; desde ahí la posicionás encima de su casa y la bajás bien.">Con R U R' U' la subo a la capa de arriba y la reinserto.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>4.</b> Terminaste. ¿Qué señal confirma que la primera capa está BIEN (no solo la cara blanca llena)?</p>
+      <button class="opt" data-fb="La cara blanca sólida es necesaria pero no basta: podrías tener el blanco completo con los costados cruzados. Falta mirar los laterales.">Que la cara blanca sea un cuadrado todo blanco.</button>
+      <button class="opt" data-fb="Eso es. Cara blanca sólida ABAJO y, en cada costado, cruz + esquinas del mismo color que su centro (una 'T' llena). Ahí la capa está realmente resuelta.">Cara blanca sólida y una 'T' de color emparejado en cada costado.</button>
+      <button class="opt" data-fb="Que la capa de arriba (amarilla) siga mezclada es normal y esperable: recién vas por la primera capa. No es señal de nada malo.">Que la cara amarilla de arriba ya esté ordenada.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="qscore" id="qscore">0 / 4 — probá las cuatro</div>
+  </div>
+
+  <div class="ask">
+    <b>👋 Tu profe.</b> Si cerraste la primera capa, ya resolvés <b>un tercio del cubo de memoria</b> con dos herramientas
+    (brújula + trigger) y el hábito de <b>confiar en el algoritmo</b> —el que vas a usar hasta en CFOP. La <b>Lección 4</b>
+    da vuelta el cubo y ataca la <b>segunda capa</b>: meter las 4 aristas del medio con dos algoritmos espejo (derecha e
+    izquierda). ¿Cuántas repeticiones te pidió la esquina más rebelde? ¿El "confiar en el algoritmo" te puso nervioso al
+    ver la cruz romperse? <b>Contame y seguimos.</b>
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">J Perm (Dylan Wang) — <cite>How To Solve The 3x3 Rubik's Cube</cite>, etapa "First Layer / corners".
+        <a href="https://www.jperm.net/3x3">jperm.net/3x3</a>. <cite>"Turn the top layer so the surrounding centers match
+        the colors on the corner"</cite>; sostener la esquina en el frente-derecha y repetir el trigger de 4 movimientos.</li>
+      <li id="r2">Ruwix / Cubelelo — <cite>Beginner's Method</cite>, esquinas de la primera capa.
+        <a href="https://ruwix.com/the-rubiks-cube/how-to-solve-the-rubiks-cube-beginners-method/">ruwix.com</a> ·
+        <a href="https://www.cubelelo.com/blogs/cubing/how-to-solve-a-rubiks-cube-beginners-method">cubelelo.com</a>.
+        Repetir <code>R U R' U'</code> hasta que la esquina quede (1, 3 o 5 veces); si está atascada abajo, el mismo trigger
+        la saca. <cite>"trust the algorithm — they return to place!"</cite></li>
+      <li id="r3">CubeSkills (Feliks Zemdegs) — <cite>The Beginner's Method</cite>.
+        <a href="https://www.cubeskills.com/tutorials/the-beginners-method-for-solving-the-rubiks-cube">cubeskills.com</a>.
+        Segunda voz del método y hojas de algoritmos limpias.</li>
+    </ol>
+    <p>Más fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Términos en <a href="../GLOSSARY.md">GLOSSARY.md</a> · Tu misión en <a href="../MISSION.md">MISSION.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <a href="0002-cruz-blanca.html">← Lección 2 · La cruz blanca</a>
+      <span style="color:#b9bdd0">Próxima · Segunda capa: aristas del medio (en construcción)</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const quiz = document.getElementById('quiz');
+  const qs = Array.from(quiz.querySelectorAll('.q'));
+  const scoreEl = document.getElementById('qscore');
+  const answered = new Array(qs.length).fill(false);
+
+  qs.forEach((q, qi) => {
+    const correct = parseInt(q.dataset.correct, 10);
+    const opts = Array.from(q.querySelectorAll('.opt'));
+    const fb = q.querySelector('.fb');
+    opts.forEach((opt, oi) => {
+      opt.addEventListener('click', () => {
+        const isRight = (oi === correct);
+        opt.classList.add(isRight ? 'right' : 'wrong');
+        fb.textContent = opt.dataset.fb;
+        fb.className = 'fb show ' + (isRight ? 'ok' : 'no');
+        if(!answered[qi]){
+          answered[qi] = isRight ? 'ok' : 'seen';
+          update();
+        }
+        if(isRight){
+          opts.forEach(o => o.disabled = true);
+        }
+      });
+    });
+  });
+
+  function update(){
+    const right = answered.filter(a => a === 'ok').length;
+    if(right === qs.length){
+      scoreEl.textContent = "✓ Las cuatro. Primera capa dominada: brújula + trigger + confiar en el algoritmo.";
+      scoreEl.classList.add('full');
+    } else {
+      scoreEl.textContent = right + " / " + qs.length + " resueltas — seguí probando";
+      scoreEl.classList.remove('full');
+    }
+  }
+})();
+</script>
+</body>
+</html>
