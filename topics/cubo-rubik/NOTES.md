@@ -29,6 +29,13 @@ minuto) están en el `NOTES.md` global de la raíz.
 9. **Hito:** resolver entero de memoria, cronometrar sin presión → hoja de referencia del método.
 10. **Puente a CFOP:** finger tricks, F2L intuitivo, luego OLL/PLL de a poco (fuente: J Perm CFOP).
 
+## Fricciones observadas
+- **0007 (ubicar esquinas):** el aprendiz se trabó ("lo hice 3 veces y no anda"). Causa dupla, no bug de la
+  lección (algoritmo `U R U' L' U R' U' L` verificado por simulación: fija UFR, cicla las otras 3, orden 3):
+  (a) el **orden 3** — aplicarlo 3× con el mismo agarre vuelve al inicio; (b) la **cara `L`** casi no se usó
+  antes y `L/L'` al revés desordena todo. Reforzado en la lección con dos avisos. **Para 0008 y futuras:**
+  cuando un algoritmo use `L`/`B` o tenga orden bajo, avisar explícitamente de ambas trampas.
+
 ## Pendientes / ideas
 - Buscar una fuente en español de alta confianza para citar (ver Gaps en RESOURCES.md).
 - Cuando llegue F2L, considerar una `reference/` visual de casos.
