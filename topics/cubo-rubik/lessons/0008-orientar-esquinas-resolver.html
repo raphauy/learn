@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
+<title>Cubo 8 — Orientar las esquinas: resolvé el cubo entero</title>
+<style>
+  :root{
+    --ink:#1b2233; --soft:#5d6478; --line:#e4e6ef; --bg:#fbfaf9;
+    --accent:#e11d48; --accent-soft:#fff1f4; --accent-line:#fbcfda; --accent-ink:#9f1239;
+    --accent2:#ea580c; --warn:#b45309; --bad:#b91c1c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(24,28,55,.07),0 8px 24px rgba(24,28,55,.06);
+    --cW:#f7f7f5; --cY:#ffd500; --cR:#d21f1f; --cO:#ff6d00; --cB:#1769d6; --cG:#2fa84a; --cGray:#e9ebf1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:780px; margin:0 auto; padding:48px 24px 96px}
+  .kicker{font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-size:33px; line-height:1.15; margin:0 0 14px; letter-spacing:-.4px}
+  .sub{font-size:18px; color:var(--soft); margin:0}
+  .mission{display:flex; gap:12px; align-items:flex-start; margin-top:24px; padding:14px 18px;
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:12px; font-size:15px; color:var(--accent-ink)}
+  .mission b{color:var(--accent)}
+  h2{font-size:23px; margin:46px 0 12px; letter-spacing:-.2px}
+  p{margin:0 0 16px}
+  a{color:var(--accent); text-underline-offset:3px}
+  sup a{font-size:12px; font-weight:700; text-decoration:none; padding:0 2px}
+  .lede{font-size:19px}
+  cite{font-style:italic}
+  em.q{font-style:italic; color:var(--accent-ink)}
+  code.mv{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:700;
+    background:#1b2233; color:#fff; padding:2px 8px; border-radius:7px; font-size:.92em; letter-spacing:.5px; white-space:nowrap}
+
+  /* algoritmo destacado */
+  .trigger{display:flex; gap:14px; align-items:center; flex-wrap:wrap; justify-content:center;
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin:20px 0; box-shadow:var(--shadow)}
+  .trigger .seq{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:26px; letter-spacing:2px;
+    background:#1b2233; color:#fff; padding:12px 20px; border-radius:12px}
+  .trigger .lab{font-size:14px; color:var(--soft); max-width:34ch}
+  .trigger .lab b{color:var(--accent)}
+
+  /* rotacion de la esquina (evidencia) */
+  .rot{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:18px 0}
+  .rc{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 12px; box-shadow:var(--shadow); text-align:center}
+  .rc .big{font-size:22px; font-weight:800; color:var(--accent)}
+  .rc h4{margin:8px 0 4px; font-size:15px}
+  .rc p{margin:0; font-size:12.5px; color:var(--soft)}
+
+  .callout{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15.5px}
+  .callout b{color:var(--accent2)}
+  .note{background:var(--accent-soft); border:1px solid var(--accent-line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:14px 18px; margin:20px 0; font-size:15px; color:var(--accent-ink)}
+  .note b{color:var(--accent)}
+
+  /* errores comunes */
+  .mistakes{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:20px 0}
+  .mk{background:#fef2f2; border:1px solid #fecaca; border-radius:12px; padding:14px 16px; font-size:14px; color:#7f1d1d}
+  .mk b{color:var(--bad)}
+
+  /* práctica / pasos */
+  .practice{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:18px 0; box-shadow:var(--shadow)}
+  .practice .lbl{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 10px; border-radius:999px}
+  .practice h3{margin:10px 0 4px; font-size:20px}
+  .step{display:flex; gap:14px; align-items:flex-start; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line)}
+  .step:first-of-type{border-top:none}
+  .step .n{flex:none; width:28px; height:28px; border-radius:8px; background:var(--accent-soft); color:var(--accent);
+    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px}
+  .step b{font-size:15px}
+  .step p{margin:3px 0 0; font-size:13.5px; color:var(--soft)}
+  .step ul{margin:6px 0 0; padding-left:18px; font-size:13.5px; color:var(--soft)}
+  .step li{margin-bottom:4px}
+  .step li b{color:var(--ink)}
+
+  /* bloque final: resuelto */
+  .done{margin:24px 0; padding:22px 24px; background:linear-gradient(135deg,#f0fdf4,#ecfdf5);
+    border:1px solid #bbf7d0; border-radius:16px; box-shadow:var(--shadow); text-align:center}
+  .done .em{font-size:40px}
+  .done h3{margin:6px 0 6px; font-size:24px; color:#14532d; letter-spacing:-.3px}
+  .done p{margin:0 auto; max-width:52ch; font-size:15px; color:#166534}
+  .done b{color:#15803d}
+
+  /* quiz */
+  .quiz{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:8px 8px 6px; margin:22px 0; box-shadow:var(--shadow); overflow:hidden}
+  .qhead{padding:16px 18px 6px}
+  .qhead h4{margin:0 0 2px; font-size:17px}
+  .qhead p{margin:0; font-size:13px; color:var(--soft)}
+  .q{padding:16px 18px; border-top:1px solid var(--line)}
+  .q .scn{font-size:15.5px; margin:0 0 12px}
+  .q .scn b{color:var(--accent-ink)}
+  .opt{display:block; width:100%; text-align:left; font:inherit; font-size:14.5px; color:var(--ink);
+    background:#fbfbfd; border:1.5px solid var(--line); border-radius:10px; padding:11px 14px; margin:8px 0; cursor:pointer; transition:all .12s}
+  .opt:hover{border-color:var(--accent-line); background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--good); background:#f0fdf4}
+  .opt.wrong{border-color:var(--bad); background:#fef2f2}
+  .fb{font-size:13.5px; margin:8px 2px 0; padding:11px 14px; border-radius:10px; display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0}
+  .fb.no{background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca}
+  .fb b{font-weight:800}
+  .qscore{padding:14px 18px; font-size:14.5px; font-weight:700; color:var(--accent); text-align:center; border-top:1px solid var(--line)}
+  .qscore.full{color:#fff; background:var(--accent)}
+
+  .ask{margin:40px 0 0; padding:18px 22px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:14px; font-size:15.5px; color:var(--accent-ink)}
+  .ask b{color:var(--accent)}
+
+  footer{margin-top:50px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--soft)}
+  footer h5{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); margin:0 0 10px}
+  footer ol{margin:0 0 18px; padding-left:20px}
+  footer li{margin-bottom:7px}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px}
+  .navlinks a{font-weight:600}
+
+  @media(max-width:560px){
+    h1{font-size:27px}
+    .rot,.mistakes{grid-template-columns:1fr}
+  }
+  @media print{
+    body{background:#fff}
+    .trigger,.rc,.practice,.quiz,.done{box-shadow:none}
+    .callout,.note,.mk,.done{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Cubo de Rubik · Lección 8 · El final del método</p>
+  <h1>Orientar las esquinas:<br>resolvé el cubo entero</h1>
+  <p class="sub">Las 4 esquinas ya están en su sitio, solo torcidas. Con un gesto de 4 movimientos las girás una por una hasta que el amarillo suba — y el cubo se arma solo.</p>
+
+  <div class="mission">
+    <span>🏁</span>
+    <div><b>Por qué esta es TU lección.</b> Es <b>el cierre</b>. Al terminarla vas a haber armado el cubo <b>de principio a fin</b>,
+    con tus propias manos y entendiendo cada paso. Justo la misión con la que arrancaste: <b>resolverlo de memoria</b>, no de suerte.
+    Después de hoy, el norte pasa a ser la <b>velocidad</b>.</div>
+  </div>
+
+  <p class="lede">Último concepto —y ya lo conocés—: <b>orientar</b>. Las esquinas están ubicadas (Lección 7); acá cada una la
+  <b>girás en el lugar</b> hasta que su amarillo mire arriba.<sup><a href="#r1">1</a></sup> Trabajás <b>una sola esquina a la vez</b>,
+  siempre en la posición <b>frente-derecha-arriba</b>.</p>
+
+  <div class="note">
+    <b>Marco de siempre:</b> <b>amarillo arriba</b>. La esquina que vas a girar va en el <b>frente-derecha-arriba</b>. El algoritmo
+    de hoy es el más corto del método —<b>4 movimientos, sin <code class="mv">U</code></b>— y usa la cara de abajo
+    (<code class="mv">D</code>). Vas a mover la capa blanca que ya resolviste: <b>es a propósito</b>, se recompone sola.
+  </div>
+
+  <h2>El gesto: R' D' R D, repetido</h2>
+  <p>Cuatro movimientos. Los repetís sobre la esquina de frente-derecha-arriba hasta que su amarillo quede arriba.<sup><a href="#r1">1</a></sup></p>
+
+  <div class="trigger">
+    <span class="seq">R' D' R D</span>
+    <span class="lab">Sobre la esquina de <b>frente-derecha-arriba</b>. Repetí <b>2 o 4 veces</b> hasta que su <b>amarillo mire arriba</b>. Nada más se toca.</span>
+  </div>
+
+  <div class="callout">
+    <b>🧠 Por qué 2 o 4, nunca impar (dato verificado).</b> Cada <b>2</b> aplicaciones de <code class="mv">R' D' R D</code>, esa
+    esquina vuelve a su sitio girada <b>un tercio</b> (120°); en los pasos impares está "de viaje" y el cubo se ve roto. Por eso el
+    amarillo solo puede subir en la <b>2ª</b> o la <b>4ª</b> pasada. Si llegás a 6, volviste al inicio: pasaste de largo.
+  </div>
+
+  <div class="rot">
+    <div class="rc"><div class="big">0</div><h4>Torcida</h4><p>Amarillo de costado (al frente o al lado), no arriba.</p></div>
+    <div class="rc"><div class="big">2×</div><h4>Giró 120°</h4><p>Si el amarillo ya mira arriba, <b>frená</b>. Si no…</p></div>
+    <div class="rc"><div class="big">4×</div><h4>Giró 240°</h4><p>…seguí hasta la 4ª: ahí sí sube. Nunca hace falta más.</p></div>
+  </div>
+
+  <h2>El movimiento entre esquinas: SOLO la cara de arriba</h2>
+  <p>Cuando una esquina quedó con el amarillo arriba, <b>no gires el cubo</b> ni las capas de abajo. Girá <b>solo <code class="mv">U</code></b>
+  para traer la próxima esquina torcida al frente-derecha-arriba, y repetí <code class="mv">R' D' R D</code>.<sup><a href="#r1">1</a></sup>
+  Cuando orientás la última, un giro final de <code class="mv">U</code> alinea todo y <b>el cubo queda resuelto</b>.</p>
+
+  <div class="callout">
+    <b>El acto de fe más grande del método.</b> A mitad de este paso el cubo va a parecer <b>completamente destruido</b> —capas rotas
+    por todos lados—. <cite>"Va a parecer que arruinaste todo el cubo, pero no te preocupes: va a estar bien cuando todas las
+    esquinas estén orientadas."</cite><sup><a href="#r1">1</a></sup> No lo corrijas a mano. Confiá y completá.
+  </div>
+
+  <h2>Los dos errores que arruinan este paso</h2>
+  <p>Es el paso donde más fácil es equivocarse.<sup><a href="#r2">2</a></sup> Casi siempre es uno de estos dos:</p>
+  <div class="mistakes">
+    <div class="mk"><b>❌ Mover el cubo entero o la capa de abajo entre esquinas.</b> Entre esquina y esquina se gira <b>solo <code class="mv">U</code></b>. Si girás el cubo o <code class="mv">D</code>, perdés la referencia y no cierra.</div>
+    <div class="mk"><b>❌ Frenar en una pasada impar.</b> El amarillo solo sube en la 2ª o 4ª. Si soltás en la 1ª o 3ª (cubo "roto"), seguí: te falta completar el par.</div>
+  </div>
+
+  <div class="practice">
+    <span class="lbl">Hacelo con el cubo en la mano</span>
+    <h3>Orientar las esquinas y cerrar el cubo</h3>
+
+    <div class="step">
+      <div class="n">1</div>
+      <div><b>Amarillo arriba.</b> Girá <code class="mv">U</code> para poner una esquina <b>torcida</b> (amarillo NO arriba) en el
+      <b>frente-derecha-arriba</b>.</div>
+    </div>
+    <div class="step">
+      <div class="n">2</div>
+      <div><b>Repetí <code class="mv">R' D' R D</code> hasta que el amarillo de ESA esquina mire arriba</b> (2 o 4 veces). Mirá solo
+      esa esquina; ignorá el caos del resto. No cuentes las esquinas que ya tienen amarillo arriba.</div>
+    </div>
+    <div class="step">
+      <div class="n">3</div>
+      <div><b>Girá SOLO <code class="mv">U</code></b> para traer la próxima esquina torcida al frente-derecha-arriba. Repetí el paso 2.
+      Nunca gires el cubo entero ni las capas de abajo.</div>
+    </div>
+    <div class="step">
+      <div class="n">4</div>
+      <div><b>Cuando orientaste la última esquina, un giro final de <code class="mv">U</code></b> alinea las capas y el cubo queda
+      <b>completamente resuelto</b>. Ese "clic" final es la magia del acto de fe.</div>
+    </div>
+  </div>
+
+  <div class="done">
+    <div class="em">🎉🧩</div>
+    <h3>¡Armaste el cubo de Rubik!</h3>
+    <p>De 20 piezas revueltas a un cubo resuelto, <b>de memoria</b> y entendiendo el porqué de cada paso. Cumpliste la misión con la
+    que arrancaste. Las 6 caras sólidas son tuyas: <b>no fue suerte, fue método.</b></p>
+  </div>
+
+  <h2>Probate: ¿dominás el cierre?</h2>
+  <p>Cuatro escenarios. Feedback al toque.</p>
+
+  <div class="quiz" id="quiz">
+    <div class="qhead"><h4>Quiz del paso final</h4><p>Tocá una opción para ver por qué.</p></div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>1.</b> Estás haciendo <code class="mv">R' D' R D</code> sobre una esquina y el cubo se ve <b>totalmente destruido</b>. ¿Qué hacés?</p>
+      <button class="opt" data-fb="No corrijas a mano ni frenes por el aspecto: acomodar a mano rompe la lógica del algoritmo. El caos es esperado y se recompone.">Freno y acomodo las capas de abajo a mano.</button>
+      <button class="opt" data-fb="Eso es. Es el acto de fe del método: seguí las pasadas de a pares mirando solo la esquina objetivo; al orientar todas, se recompone.">Sigo; miro solo esa esquina hasta que el amarillo suba.</button>
+      <button class="opt" data-fb="No hace falta reiniciar: no está roto, está a mitad de un par de pasadas. Completá hasta que el amarillo suba.">Deshago todo y vuelvo a empezar.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="2">
+      <p class="scn"><b>2.</b> Una esquina quedó con el amarillo arriba. Para pasar a la siguiente esquina torcida, ¿qué movés?</p>
+      <button class="opt" data-fb="Girar el cubo entero te hace perder la referencia de frente-derecha-arriba y descoloca el conteo. Solo se gira una cara.">Giro el cubo entero para encarar otra esquina.</button>
+      <button class="opt" data-fb="La capa de abajo (D) es justo lo que NO se toca entre esquinas: la movés solo dentro del R' D' R D. Entre esquinas, otra cosa.">Giro la capa de abajo (D) para reposicionar.</button>
+      <button class="opt" data-fb="Correcto. Solo girás U para traer la próxima esquina torcida al frente-derecha-arriba. Nunca el cubo entero ni las capas de abajo.">Giro solo la capa de arriba (U).</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="0">
+      <p class="scn"><b>3.</b> Hiciste <code class="mv">R' D' R D</code> <b>una</b> vez y el amarillo no subió y el cubo se ve roto. ¿Qué significa?</p>
+      <button class="opt" data-fb="Exacto. El amarillo solo sube en pasadas pares (2 o 4). En la 1ª estás a mitad de camino: seguí hasta completar el par.">Normal: va de a pares; seguí hasta la 2ª (o 4ª) pasada.</button>
+      <button class="opt" data-fb="No te equivocaste de algoritmo: R' D' R D es el correcto. Solo que una sola pasada nunca alcanza; el amarillo sube en la 2ª o 4ª.">Usé el algoritmo equivocado.</button>
+      <button class="opt" data-fb="La esquina no está en su lugar equivocado: ubicarla fue la lección anterior. Acá solo la estás girando, y falta completar el par de pasadas.">La esquina está mal ubicada; vuelvo a la Lección 7.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="1">
+      <p class="scn"><b>4.</b> ¿Por qué este algoritmo puede mover la capa blanca de abajo sin arruinar el cubo?</p>
+      <button class="opt" data-fb="No es que 'no la mueva': sí la mueve (usa D). La clave es otra: el algoritmo se completa en ciclos que la devuelven a su lugar.">Porque en realidad no toca la capa de abajo.</button>
+      <button class="opt" data-fb="Eso es. R' D' R D desarma y rearma: al completar las pasadas necesarias (pares) sobre cada esquina, las capas de abajo vuelven a su lugar. Por eso el caos es temporal.">Porque desarma y rearma: al completar los pares, todo vuelve.</button>
+      <button class="opt" data-fb="La suerte no interviene: el cubo es determinista. El algoritmo garantiza que, completado, las capas de abajo se recomponen.">Porque con suerte las piezas caen bien.</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="qscore" id="qscore">0 / 4 — probá las cuatro</div>
+  </div>
+
+  <div class="ask">
+    <b>👋 Tu profe.</b> Si el cubo quedó resuelto, <b>completaste el método capa por capa entero</b> 🎉. Lo próximo no es un algoritmo
+    nuevo: es <b>afianzar</b>. Armalo <b>varias veces de memoria</b> (sin mirar nada) hasta que salga siempre, y usá la
+    <a href="../reference/metodo-principiante.html">hoja de referencia</a> que te armé para repasar los 7 algoritmos de un vistazo.
+    Cuando salga fluido, arrancamos el <b>puente a CFOP</b> (velocidad): finger tricks y F2L intuitivo. ¿Cuántas esquinas tenías
+    torcidas? ¿El "acto de fe" te puso nervioso? <b>Contame cómo se sintió cerrarlo.</b>
+  </div>
+
+  <footer>
+    <h5>Fuentes</h5>
+    <ol>
+      <li id="r1">Ruwix — <cite>Beginner's Method</cite>, orientar las esquinas de la última capa.
+        <a href="https://ruwix.com/the-rubiks-cube/how-to-solve-the-rubiks-cube-beginners-method/">ruwix.com</a>.
+        Algoritmo <code>R' D' R D</code>; esquina sin resolver en el frente-derecha-arriba, repetir <cite>"twice or four times
+        until that specific piece is oriented well"</cite>; entre esquinas girar solo la capa de arriba;
+        <cite>"It will look like you've messed up the whole cube but don't worry, it will be all right when all the corner pieces
+        are oriented."</cite></li>
+      <li id="r2">J Perm (Dylan Wang) — <cite>How To Solve The 3x3 Rubik's Cube</cite>, paso final "Solve the Cube".
+        <a href="https://www.jperm.net/3x3">jperm.net/3x3</a>. Advierte: <cite>"It is very easy to make a mistake during this step,
+        so I recommend reading the whole thing, including the common mistakes, before attempting it."</cite> · entre esquinas
+        <cite>"turn the bottom layer (not the whole cube)"</cite> (en su variante con el amarillo abajo).</li>
+      <li id="r3">CubeSkills (Feliks Zemdegs) — <cite>The Beginner's Method</cite>.
+        <a href="https://www.cubeskills.com/tutorials/the-beginners-method-for-solving-the-rubiks-cube">cubeskills.com</a>.
+        Segunda voz del método y hojas de algoritmos limpias.</li>
+    </ol>
+    <p>Todos los algoritmos juntos en la <a href="../reference/metodo-principiante.html">hoja de referencia</a> ·
+    Más fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Términos en <a href="../GLOSSARY.md">GLOSSARY.md</a> · Tu misión en <a href="../MISSION.md">MISSION.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <a href="0007-ubicar-esquinas.html">← Lección 7 · Ubicar las esquinas</a>
+      <a href="../reference/metodo-principiante.html">Hoja de referencia · Método completo →</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const quiz = document.getElementById('quiz');
+  const qs = Array.from(quiz.querySelectorAll('.q'));
+  const scoreEl = document.getElementById('qscore');
+  const answered = new Array(qs.length).fill(false);
+
+  qs.forEach((q, qi) => {
+    const correct = parseInt(q.dataset.correct, 10);
+    const opts = Array.from(q.querySelectorAll('.opt'));
+    const fb = q.querySelector('.fb');
+    opts.forEach((opt, oi) => {
+      opt.addEventListener('click', () => {
+        const isRight = (oi === correct);
+        opt.classList.add(isRight ? 'right' : 'wrong');
+        fb.textContent = opt.dataset.fb;
+        fb.className = 'fb show ' + (isRight ? 'ok' : 'no');
+        if(!answered[qi]){
+          answered[qi] = isRight ? 'ok' : 'seen';
+          update();
+        }
+        if(isRight){
+          opts.forEach(o => o.disabled = true);
+        }
+      });
+    });
+  });
+
+  function update(){
+    const right = answered.filter(a => a === 'ok').length;
+    if(right === qs.length){
+      scoreEl.textContent = "✓ Las cuatro. Método completo dominado: orientar de a pares, solo U entre esquinas, y confiar hasta el final.";
+      scoreEl.classList.add('full');
+    } else {
+      scoreEl.textContent = right + " / " + qs.length + " resueltas — seguí probando";
+      scoreEl.classList.remove('full');
+    }
+  }
+})();
+</script>
+</body>
+</html>

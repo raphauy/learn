@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
+<title>Cubo de Rubik — Hoja de referencia del método capa por capa</title>
+<style>
+  :root{
+    --ink:#1b2233; --soft:#5d6478; --line:#e4e6ef; --bg:#fbfaf9;
+    --accent:#e11d48; --accent-soft:#fff1f4; --accent-line:#fbcfda; --accent-ink:#9f1239;
+    --accent2:#ea580c; --good:#15803d;
+    --card:#ffffff; --shadow:0 1px 3px rgba(24,28,55,.07),0 8px 24px rgba(24,28,55,.06);
+    --cY:#ffd500;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; letter-spacing:.1px}
+  .wrap{max-width:820px; margin:0 auto; padding:44px 22px 90px}
+  .kicker{font-size:12.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 8px}
+  h1{font-size:30px; line-height:1.15; margin:0 0 10px; letter-spacing:-.4px}
+  .sub{font-size:16.5px; color:var(--soft); margin:0 0 8px; max-width:60ch}
+  a{color:var(--accent); text-underline-offset:3px}
+  code.mv{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:700;
+    background:#1b2233; color:#fff; padding:2px 7px; border-radius:6px; font-size:.9em; letter-spacing:.4px; white-space:nowrap}
+
+  /* recordatorio de notacion */
+  .notation{display:flex; gap:10px; flex-wrap:wrap; margin:20px 0 8px}
+  .nchip{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:8px 12px; font-size:13px; color:var(--soft); box-shadow:var(--shadow)}
+  .nchip b{color:var(--ink)}
+
+  /* pasos */
+  .steps{display:grid; gap:14px; margin:22px 0}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 18px; box-shadow:var(--shadow)}
+  .card .top{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
+  .card .num{flex:none; width:30px; height:30px; border-radius:9px; background:var(--accent-soft); color:var(--accent);
+    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px}
+  .card h3{margin:0; font-size:18px; letter-spacing:-.2px}
+  .card .goal{font-size:13px; color:var(--soft)}
+  .card .algos{margin:12px 0 6px; display:flex; flex-direction:column; gap:8px}
+  .algo{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+  .algo .tag{flex:none; font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--accent-ink);
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:999px; padding:3px 9px}
+  .algo .seq{font-family:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:16px; letter-spacing:1px;
+    background:#1b2233; color:#fff; padding:8px 14px; border-radius:10px}
+  .card .key{margin:8px 0 0; font-size:13.5px; color:var(--soft)}
+  .card .key b{color:var(--ink)}
+  .card .lk{font-size:12.5px; margin-top:8px}
+
+  .tip{background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--accent2);
+    border-radius:10px; padding:12px 16px; margin:18px 0; font-size:14px}
+  .tip b{color:var(--accent2)}
+  .win{background:linear-gradient(135deg,#f0fdf4,#ecfdf5); border:1px solid #bbf7d0; border-radius:12px;
+    padding:14px 18px; margin:18px 0; font-size:14.5px; color:#166534}
+  .win b{color:#15803d}
+
+  footer{margin-top:34px; padding-top:20px; border-top:1px solid var(--line); font-size:13px; color:var(--soft)}
+  .navlinks{display:flex; gap:16px; flex-wrap:wrap; margin-top:6px}
+  .navlinks a{font-weight:600}
+  @media(max-width:560px){ h1{font-size:25px} }
+  @media print{ body{background:#fff} .card,.nchip{box-shadow:none} .tip,.win{-webkit-print-color-adjust:exact;print-color-adjust:exact} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Cubo de Rubik · Referencia</p>
+  <h1>Método capa por capa — hoja de referencia</h1>
+  <p class="sub">Los 7 pasos para armar el 3x3 de memoria, en una página. La esencia comprimida de las 8 lecciones:
+  qué hacés, el algoritmo, y la clave que se olvida. Para repasar de un vistazo.</p>
+
+  <div class="notation">
+    <span class="nchip"><b>U D R L F B</b> — girá esa cara 90° horario (mirándola de frente)</span>
+    <span class="nchip"><b>'</b> (prime) — antihorario</span>
+    <span class="nchip"><b>2</b> — media vuelta (180°)</span>
+    <span class="nchip">Marco: <b>blanco abajo, amarillo arriba</b></span>
+  </div>
+
+  <div class="steps">
+
+    <div class="card">
+      <div class="top"><span class="num">1</span><h3>Cruz blanca</h3><span class="goal">— emparejada con los centros</span></div>
+      <div class="key"><b>Técnica margarita:</b> armá 4 pétalos blancos alrededor del centro <b>amarillo</b> (arriba); bajá cada uno con
+      <code class="mv">F2</code> después de alinear su color de costado con el centro lateral. No es un algoritmo fijo: es leer la brújula.</div>
+      <div class="lk"><a href="../lessons/0002-cruz-blanca.html">→ Lección 2</a></div>
+    </div>
+
+    <div class="card">
+      <div class="top"><span class="num">2</span><h3>Primera capa: esquinas</h3><span class="goal">— cierra la cara blanca</span></div>
+      <div class="algos">
+        <div class="algo"><span class="tag">Trigger</span><span class="seq">R U R' U'</span></div>
+      </div>
+      <div class="key">Poné la esquina blanca en la capa de arriba, <b>encima de su casa</b> (sus 2 centros laterales visibles), sostenela
+      en <b>frente-derecha</b> y repetí el trigger <b>1, 3 o 5 veces</b> hasta que caiga con el blanco abajo.</div>
+      <div class="lk"><a href="../lessons/0003-esquinas-primera-capa.html">→ Lección 3</a></div>
+    </div>
+
+    <div class="card">
+      <div class="top"><span class="num">3</span><h3>Segunda capa: aristas del medio</h3><span class="goal">— las 4 aristas sin amarillo</span></div>
+      <div class="algos">
+        <div class="algo"><span class="tag">Derecha</span><span class="seq">U R U' R' U' F' U F</span></div>
+        <div class="algo"><span class="tag">Izquierda</span><span class="seq">U' L' U L U F U' F'</span></div>
+      </div>
+      <div class="key">Arista <b>sin amarillo</b> arriba. Girá <code class="mv">U</code> hasta la <b>T invertida</b> (color de costado = su centro);
+      el color de arriba apunta al lado al que va. <b>Atascada mal en el medio:</b> meté cualquiera en su ranura para expulsarla.</div>
+      <div class="lk"><a href="../lessons/0004-segunda-capa-aristas.html">→ Lección 4</a></div>
+    </div>
+
+    <div class="card">
+      <div class="top"><span class="num">4</span><h3>Cruz amarilla</h3><span class="goal">— orientar las aristas de arriba</span></div>
+      <div class="algos">
+        <div class="algo"><span class="tag">Sexy en sándwich</span><span class="seq">F R U R' U' F'</span></div>
+      </div>
+      <div class="key">Mirá <b>solo las aristas</b> (ignorá esquinas). Leé la forma: <b>punto</b> → <b>L</b> (apuntando arriba-izquierda) →
+      <b>línea</b> (horizontal) → <b>cruz</b>. Aún <b>no</b> tiene que coincidir con los centros.</div>
+      <div class="lk"><a href="../lessons/0005-cruz-amarilla.html">→ Lección 5</a></div>
+    </div>
+
+    <div class="card">
+      <div class="top"><span class="num">5</span><h3>Emparejar la cruz amarilla</h3><span class="goal">— ubicar las aristas de arriba</span></div>
+      <div class="algos">
+        <div class="algo"><span class="tag">Sune</span><span class="seq">R U R' U R U2 R' U</span></div>
+      </div>
+      <div class="key">Girá <code class="mv">U</code> hasta que <b>2 aristas</b> coincidan con su centro. <b>Adyacentes:</b> emparejadas
+      <b>atrás + derecha</b>, aplicá 1 vez. <b>Opuestas o ninguna:</b> aplicá una vez y reevaluá. (Revuelve las esquinas: no importa aún.)</div>
+      <div class="lk"><a href="../lessons/0006-emparejar-cruz-amarilla.html">→ Lección 6</a></div>
+    </div>
+
+    <div class="card">
+      <div class="top"><span class="num">6</span><h3>Ubicar las esquinas</h3><span class="goal">— cada una a su vértice (aunque torcida)</span></div>
+      <div class="algos">
+        <div class="algo"><span class="tag">Ciclo de esquinas</span><span class="seq">U R U' L' U R' U' L</span></div>
+      </div>
+      <div class="key">Esquina "en su lugar" = sus <b>3 colores</b> son los del vértice (sin importar el giro). Anclá la correcta en
+      <b>frente-derecha</b>; cicla las otras 3. <b>Ninguna correcta:</b> aplicá una vez para que aparezca una. <b>Mirá tras cada
+      pasada</b> (es orden 3: 3 veces = vuelve al inicio). Ojo con la <code class="mv">L</code>.</div>
+      <div class="lk"><a href="../lessons/0007-ubicar-esquinas.html">→ Lección 7</a></div>
+    </div>
+
+    <div class="card">
+      <div class="top"><span class="num">7</span><h3>Orientar las esquinas — ¡resolver!</h3><span class="goal">— girar cada esquina hasta el amarillo arriba</span></div>
+      <div class="algos">
+        <div class="algo"><span class="tag">El más corto</span><span class="seq">R' D' R D</span></div>
+      </div>
+      <div class="key">Esquina torcida en <b>frente-derecha-arriba</b>. Repetí <b>2 o 4 veces</b> hasta que su amarillo suba (nunca impar).
+      Entre esquinas girá <b>solo <code class="mv">U</code></b> (jamás el cubo entero ni <code class="mv">D</code>). El cubo se ve
+      <b>destruido</b> a mitad: es normal, se recompone. Último <code class="mv">U</code> → <b>resuelto</b>.</div>
+      <div class="lk"><a href="../lessons/0008-orientar-esquinas-resolver.html">→ Lección 8</a></div>
+    </div>
+
+  </div>
+
+  <div class="tip">
+    <b>Reglas de oro (valen para todo el método):</b> leé la pieza por sus colores (los centros son la brújula) · confiá en el
+    algoritmo, no corrijas a mano a mitad · una etapa no rompe la anterior aunque lo parezca · frená a mirar entre pasadas.
+  </div>
+
+  <div class="win">
+    <b>Para armar de memoria:</b> practicá cada paso hasta que salga sin leer, después encadená los 7 sin esta hoja. Cuando
+    lo resuelvas seguido y fluido, el próximo arco es <b>CFOP</b> (velocidad): finger tricks y F2L intuitivo.
+  </div>
+
+  <footer>
+    <p>Términos en <a href="../GLOSSARY.md">GLOSSARY.md</a> · Fuentes en <a href="../RESOURCES.md">RESOURCES.md</a> · Tu misión en <a href="../MISSION.md">MISSION.md</a>.</p>
+    <div class="navlinks">
+      <a href="../../../index.html">← Todos los temas</a>
+      <a href="../lessons/0008-orientar-esquinas-resolver.html">← Lección 8 · El final</a>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

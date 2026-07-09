@@ -25,9 +25,10 @@ minuto) están en el `NOTES.md` global de la raíz.
 5. ✅ **0005 — Cruz amarilla** (orientar aristas ULT: `F R U R' U' F'` = sexy en sándwich; leer punto/L/línea; ignorar esquinas; aún NO empareja con centros).
 6. ✅ **0006 — Emparejar la cruz amarilla** (permutar aristas ULT: girar U p/ 2 coincidan; `R U R' U R U2 R' U` = Sune, con emparejadas atrás+derecha; casos adyacentes/opuestas/ninguna).
 7. ✅ **0007 — Ubicar esquinas** (permutar esquinas ULT: reconocer esquina en su vértice s/importar giro; ancla en frente-derecha + `U R U' L' U R' U' L` cicla las otras 3; caso 0 correctas; queda "caótico" pero ubicado).
-8. **0008 — Orientar esquinas / resolver** (el clásico "R' D' R D").
-9. **Hito:** resolver entero de memoria, cronometrar sin presión → hoja de referencia del método.
-10. **Puente a CFOP:** finger tricks, F2L intuitivo, luego OLL/PLL de a poco (fuente: J Perm CFOP).
+8. ✅ **0008 — Orientar esquinas / resolver** (`R' D' R D` 2 o 4 veces s/esquina en frente-derecha-arriba, amarillo arriba; solo `U` entre esquinas; máximo acto de fe; verificado: orden 6, rota 120° cada 2 pasadas). **MÉTODO COMPLETO.**
+9. ✅ **Hoja de referencia** creada: `reference/metodo-principiante.html` (los 7 algoritmos en una página). Registrada en `index.html` (refs).
+10. **Hito pendiente:** que resuelva el cubo **entero de memoria** varias veces, fluido, sin la hoja. Recién ahí cronometrar sin presión.
+11. **Puente a CFOP:** finger tricks, F2L intuitivo, luego OLL/PLL de a poco (fuente: J Perm CFOP). No arrancar hasta que el método de memoria esté sólido (J Perm: no apurar cosas nuevas).
 
 ## Fricciones observadas
 - **0007 (ubicar esquinas):** el aprendiz se trabó ("lo hice 3 veces y no anda"). Causa dupla, no bug de la
